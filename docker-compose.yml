@@ -1,0 +1,46 @@
+# docker compose -f docker-compose.yml -p development up --build
+
+services:
+  postgres: 
+    image: postgres:16.3
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    
+  orders:
+    build: 
+      context: ./Orders
+      dockerfile: Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ENVIRONMENT}
+      ConnectionStrings__Db: Server=postgres;Port=5432;Database=Orders;User Id=${DB_USER};Password=${DB_PASSWORD}
+    depends_on:
+      - postgres
+    ports:
+      - "8081:8080"
+
+  catalog:
+    build: 
+      context: ./Catalog
+      dockerfile: Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ENVIRONMENT}
+      ConnectionStrings__Db: Server=postgres;Port=5432;Database=Catalog;User Id=${DB_USER};Password=${DB_PASSWORD}
+    depends_on:
+      - postgres
+    ports:
+      - "8082:8080"
+
+  basket-and-wishlist:
+    build: 
+      context: ./BasketAndWishlist
+      dockerfile: Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ENVIRONMENT}
+      ConnectionStrings__Db: Server=postgres;Port=5432;Database=BasketAndWishlist;User Id=${DB_USER};Password=${DB_PASSWORD}
+    depends_on:
+      - postgres
+    ports:
+      - "8083:8080"
