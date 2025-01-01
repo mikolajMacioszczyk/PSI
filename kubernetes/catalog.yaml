@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog
+  namespace: default
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: catalog
+  template:
+    metadata:
+      labels:
+        app: catalog
+    spec:
+      containers:
+        - name: catalog
+          image: development-catalog:latest
+          imagePullPolicy: Never
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: ENVIRONMENT
+            - name: ConnectionStrings__Db
+              value: "Server=shop-db;Port=5432;Database=Catalog;User Id=$(DB_USER);Password=$(DB_PASSWORD)"
+          envFrom:
+            - configMapRef:
+                name: app-config
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog
+  namespace: default
+spec:
+  ports:
+    - port: 8082
+      targetPort: 8080
+  selector:
+    app: catalog

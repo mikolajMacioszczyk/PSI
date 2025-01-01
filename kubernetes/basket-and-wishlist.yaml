@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: basket-and-wishlist
+  namespace: default
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: basket-and-wishlist
+  template:
+    metadata:
+      labels:
+        app: basket-and-wishlist
+    spec:
+      containers:
+        - name: basket-and-wishlist
+          image: development-basket-and-wishlist
+          imagePullPolicy: Never
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: ENVIRONMENT
+            - name: ConnectionStrings__Db
+              value: "Server=shop-db;Port=5432;Database=BasketAndWishlist;User Id=$(DB_USER);Password=$(DB_PASSWORD)"
+          envFrom:
+            - configMapRef:
+                name: app-config
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: basket-and-wishlist
+  namespace: default
+spec:
+  ports:
+    - port: 8083
+      targetPort: 8080
+  selector:
+    app: basket-and-wishlist

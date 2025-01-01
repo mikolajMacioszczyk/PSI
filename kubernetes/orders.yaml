@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: orders
+  template:
+    metadata:
+      labels:
+        app: orders
+    spec:
+      containers:
+        - name: orders
+          image: development-orders
+          imagePullPolicy: Never
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: ENVIRONMENT
+            - name: ConnectionStrings__Db
+              value: "Server=shop-db;Port=5432;Database=Orders;User Id=$(DB_USER);Password=$(DB_PASSWORD)"
+          envFrom:
+            - configMapRef:
+                name: app-config
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders
+  namespace: default
+spec:
+  ports:
+    - port: 8081
+      targetPort: 8080
+  selector:
+    app: orders

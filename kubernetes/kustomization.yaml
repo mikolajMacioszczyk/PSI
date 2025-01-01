@@ -1,0 +1,8 @@
+# spply: kubectl apply -k ./
+# cleaning up: kubectl delete -k ./
+resources:
+  - configmap.yaml
+  - shop-db.yaml
+  - catalog.yaml
+  - orders.yaml
+  - basket-and-wishlist.yaml
