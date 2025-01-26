@@ -32,6 +32,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: ${ENVIRONMENT}
       ConnectionStrings__Db: Server=shop-db;Port=5432;Database=Orders;User Id=${DB_USER};Password=${DB_PASSWORD}
+      KeycloakServiceConfig__AuthServerUrl: http://keycloak:8080/
     depends_on:
       - shop-db
     ports:

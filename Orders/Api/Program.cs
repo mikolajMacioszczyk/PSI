@@ -61,6 +61,9 @@ builder.Services.AddCors(options =>
     });
 });
 
+// tokena validation
+builder.Services.AddKeycloakJwtAuthentication(builder, builder.Environment);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
