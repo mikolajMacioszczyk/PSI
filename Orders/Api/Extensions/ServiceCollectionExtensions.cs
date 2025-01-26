@@ -60,7 +60,7 @@ public static class ServiceCollectionExtensions
 
     public const string IntrospectionSchemeName = "Introspection";
 
-    public static IServiceCollection AddKeycloakJwtAuthentication(this IServiceCollection services, WebApplicationBuilder builder, IHostEnvironment env)
+    public static IServiceCollection AddKeycloakJwtAuthentication(this IServiceCollection services, WebApplicationBuilder builder, IHostEnvironment env, bool withIntrospection)
     {
         var keycloakServiceConfig = builder.Configuration.GetSection(nameof(KeycloakServiceConfig)).Get<KeycloakServiceConfig>()!;
 
@@ -69,7 +69,7 @@ public static class ServiceCollectionExtensions
             authenticationOptions.AuthServerUrl = keycloakServiceConfig.AuthServerUrl;
             authenticationOptions.Realm = keycloakServiceConfig.Realm;
             authenticationOptions.Resource = keycloakServiceConfig.ClientId;
-            authenticationOptions.VerifyTokenAudience = true;
+            authenticationOptions.VerifyTokenAudience = false;
             authenticationOptions.TokenClockSkew = TimeSpan.FromSeconds(5);
             authenticationOptions.SslRequired = "none";
             authenticationOptions.Credentials = new KeycloakClientInstallationCredentials
@@ -85,7 +85,10 @@ public static class ServiceCollectionExtensions
             // enables using "roles" and "name" claims in authorization attributes
             jwtBearerOptions.MapInboundClaims = false;
             jwtBearerOptions.SaveToken = env.IsDevelopment();
-            jwtBearerOptions.ForwardAuthenticate = IntrospectionSchemeName;
+            if (withIntrospection)
+            {
+                jwtBearerOptions.ForwardAuthenticate = IntrospectionSchemeName;
+            }
 
             jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
             {
@@ -93,7 +96,7 @@ public static class ServiceCollectionExtensions
                 ValidateLifetime = true,
                 ValidateIssuer = true,
                 ValidateAudience = true,
-                LogValidationExceptions = true,
+                ValidAudiences = ["account"],
 
                 // Ensures that "roles" claim type received in Access Token from Azure AD
                 // will be used in Authorize attribute eg. [Authorize(Roles = "Admin")]
@@ -154,6 +157,25 @@ public static class ServiceCollectionExtensions
                     RequireHttps = false,
                     ValidateIssuerName = false,
                     ValidateEndpoints = false,
+                };
+
+                options.Events = new IdentityModel.AspNetCore.OAuth2Introspection.OAuth2IntrospectionEvents
+                {
+                    OnTokenValidated = context =>
+                    {
+                        var claimsIdentity = context.Principal!.Identity as ClaimsIdentity;
+                        if (claimsIdentity != null)
+                        {
+                            var roleClaims = claimsIdentity.FindAll("appRole").Select(c => c.Value).ToList();
+
+                            foreach (var role in roleClaims)
+                            {
+                                claimsIdentity.AddClaim(new Claim(claimsIdentity.RoleClaimType, role));
+                            }
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
 

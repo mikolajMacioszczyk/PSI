@@ -62,7 +62,7 @@ builder.Services.AddCors(options =>
 });
 
 // tokena validation
-builder.Services.AddKeycloakJwtAuthentication(builder, builder.Environment);
+builder.Services.AddKeycloakJwtAuthentication(builder, builder.Environment, withIntrospection: true);
 
 var app = builder.Build();
 

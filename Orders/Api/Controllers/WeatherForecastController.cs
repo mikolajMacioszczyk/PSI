@@ -1,3 +1,4 @@
+using Api.Extensions;
 using Application.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +7,6 @@ namespace Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [AllowAnonymous]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
@@ -21,8 +21,22 @@ namespace Api.Controllers
             _logger = logger;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        [Authorize(Roles = RoleNames.Admin)]
+        [HttpGet("admin")]
+        public IEnumerable<WeatherForecast> GetAsAdmin()
+        {
+            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            {
+                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+                TemperatureC = Random.Shared.Next(-20, 55),
+                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+            })
+            .ToArray();
+        }
+
+        [Authorize(Roles = RoleNames.Customer)]
+        [HttpGet("customer")]
+        public IEnumerable<WeatherForecast> GetAsCustomer()
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
