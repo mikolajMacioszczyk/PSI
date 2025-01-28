@@ -18,7 +18,7 @@ namespace Infrastructure.AuthenticationAdapters
         {
             var keycloakServiceConfig = builder.Configuration.GetSection(nameof(KeycloakServiceConfig)).Get<KeycloakServiceConfig>()!;
 
-            var authorizationBuilder = services.AddKeycloakWebApiAuthentication(authenticationOptions =>
+            var authenticationBuilder = services.AddKeycloakWebApiAuthentication(authenticationOptions =>
             {
                 authenticationOptions.AuthServerUrl = keycloakServiceConfig.AuthServerUrl;
                 authenticationOptions.Realm = keycloakServiceConfig.Realm;
@@ -31,76 +31,85 @@ namespace Infrastructure.AuthenticationAdapters
                     Secret = keycloakServiceConfig.Secret,
                 };
             },
-            jwtBearerOptions =>
+            jwtBearerOptions => ConfigureJwtBearerOptions(jwtBearerOptions, withIntrospection, env.IsDevelopment()));
+
+            services.ConfigureIntrospection(authenticationBuilder, keycloakServiceConfig);
+
+            return services;
+        }
+
+        private static void ConfigureJwtBearerOptions(JwtBearerOptions jwtBearerOptions, bool withIntrospection, bool isDevelopment)
+        {
+            jwtBearerOptions.RequireHttpsMetadata = false;
+
+            // Prevent middleware to modify claims after successful authentication,
+            // enables using "roles" and "name" claims in authorization attributes
+            jwtBearerOptions.MapInboundClaims = false;
+            jwtBearerOptions.SaveToken = isDevelopment;
+            if (withIntrospection)
             {
-                jwtBearerOptions.RequireHttpsMetadata = false;
+                jwtBearerOptions.ForwardAuthenticate = IntrospectionSchemeName;
+            }
 
-                // Prevent middleware to modify claims after successful authentication,
-                // enables using "roles" and "name" claims in authorization attributes
-                jwtBearerOptions.MapInboundClaims = false;
-                jwtBearerOptions.SaveToken = env.IsDevelopment();
-                if (withIntrospection)
+            jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                ValidateLifetime = true,
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidAudiences = ["account"],
+
+                // Ensures that "roles" claim type received in Access Token from Azure AD
+                // will be used in Authorize attribute eg. [Authorize(Roles = "Admin")]
+                // or ClaimsPrincipal user.IsInRole("Admin")
+                RoleClaimType = "appRole",
+                NameClaimType = "name",
+            };
+
+            jwtBearerOptions.Events = new JwtBearerEvents()
+            {
+                OnTokenValidated = (ctx) =>
                 {
-                    jwtBearerOptions.ForwardAuthenticate = IntrospectionSchemeName;
-                }
+                    ArgumentNullException.ThrowIfNull(ctx.Principal);
+                    var identity = ctx.Principal?.Identities.Single();
 
-                jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    ValidateLifetime = true,
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidAudiences = ["account"],
-
-                    // Ensures that "roles" claim type received in Access Token from Azure AD
-                    // will be used in Authorize attribute eg. [Authorize(Roles = "Admin")]
-                    // or ClaimsPrincipal user.IsInRole("Admin")
-                    RoleClaimType = "appRole",
-                    NameClaimType = "name",
-                };
-
-                jwtBearerOptions.Events = new JwtBearerEvents()
-                {
-                    OnTokenValidated = (ctx) =>
+                    // This mapping is required by Ocelot as it checks for "scope" claim instead of "scp"    
+                    if (identity != null)
                     {
-                        ArgumentNullException.ThrowIfNull(ctx.Principal);
-                        var identity = ctx.Principal?.Identities.Single();
+                        var scopeClaim = identity.FindFirst("scope");
 
-                        // This mapping is required by Ocelot as it checks for "scope" claim instead of "scp"    
-                        if (identity != null)
+                        if (scopeClaim != null && scopeClaim.Value.Contains("api"))
                         {
-                            var scopeClaim = identity.FindFirst("scope");
-
-                            if (scopeClaim != null && scopeClaim.Value.Contains("api"))
-                            {
-                                var newScopeClaim = new Claim("scope", "api");
-                                identity.TryRemoveClaim(scopeClaim);
-                                identity.AddClaim(newScopeClaim);
-                            }
+                            var newScopeClaim = new Claim("scope", "api");
+                            identity.TryRemoveClaim(scopeClaim);
+                            identity.AddClaim(newScopeClaim);
                         }
-
-                        return Task.CompletedTask;
                     }
+
+                    return Task.CompletedTask;
+                }
+            };
+
+            if (isDevelopment)
+            {
+                var httpHandler = new HttpClientHandler()
+                {
+                    ServerCertificateCustomValidationCallback = delegate { return true; },
+                    AllowAutoRedirect = false,
+                    CheckCertificateRevocationList = false,
+                    ClientCertificateOptions = ClientCertificateOption.Manual
                 };
 
-                if (env.IsDevelopment())
-                {
-                    var httpHandler = new HttpClientHandler()
-                    {
-                        ServerCertificateCustomValidationCallback = delegate { return true; },
-                        AllowAutoRedirect = false,
-                        CheckCertificateRevocationList = false,
-                        ClientCertificateOptions = ClientCertificateOption.Manual
-                    };
+                jwtBearerOptions.Backchannel = new HttpClient(httpHandler);
+                jwtBearerOptions.Backchannel.DefaultRequestHeaders.UserAgent.ParseAdd("Microsoft ASP.NET Core JwtBearer handler");
+                jwtBearerOptions.Backchannel.Timeout = jwtBearerOptions.BackchannelTimeout;
+                jwtBearerOptions.Backchannel.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
+            }
+        }
 
-                    jwtBearerOptions.Backchannel = new HttpClient(httpHandler);
-                    jwtBearerOptions.Backchannel.DefaultRequestHeaders.UserAgent.ParseAdd("Microsoft ASP.NET Core JwtBearer handler");
-                    jwtBearerOptions.Backchannel.Timeout = jwtBearerOptions.BackchannelTimeout;
-                    jwtBearerOptions.Backchannel.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
-                }
-            });
-
-            services.AddAuthentication(authorizationBuilder.JwtBearerAuthenticationScheme)
+        private static void ConfigureIntrospection(this IServiceCollection services, KeycloakWebApiAuthenticationBuilder authenticationBuilder, KeycloakServiceConfig keycloakServiceConfig)
+        {
+            services.AddAuthentication(authenticationBuilder.JwtBearerAuthenticationScheme)
                 .AddOAuth2Introspection(IntrospectionSchemeName, options =>
                 {
                     options.Authority = $"{keycloakServiceConfig.AuthServerUrl}realms/{keycloakServiceConfig.Realm}";
@@ -132,8 +141,6 @@ namespace Infrastructure.AuthenticationAdapters
                         }
                     };
                 });
-
-            return services;
         }
     }
 }
