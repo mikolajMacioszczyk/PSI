@@ -1,4 +1,4 @@
-using Api.Extensions;
+using Application.Consts;
 using Application.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

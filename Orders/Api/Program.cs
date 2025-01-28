@@ -1,6 +1,7 @@
 using Api.Extensions;
 using Application.Interfaces;
 using FluentValidation.AspNetCore;
+using Infrastructure.AuthenticationAdapters;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using System.Reflection;

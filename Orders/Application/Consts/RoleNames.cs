@@ -1,4 +1,4 @@
-﻿namespace Api.Extensions
+﻿namespace Application.Consts
 {
     public static class RoleNames
     {

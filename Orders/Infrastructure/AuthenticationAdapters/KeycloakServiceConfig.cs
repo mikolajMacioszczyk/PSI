@@ -1,4 +1,4 @@
-﻿namespace Api.Extensions
+﻿namespace Infrastructure.AuthenticationAdapters
 {
     public class KeycloakServiceConfig
     {
