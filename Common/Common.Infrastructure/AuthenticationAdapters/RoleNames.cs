@@ -1,4 +1,4 @@
-﻿namespace Application.Consts
+﻿namespace Common.Infrastructure.AuthenticationAdapters
 {
     public static class RoleNames
     {

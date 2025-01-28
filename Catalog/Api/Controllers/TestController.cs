@@ -1,5 +1,5 @@
-using Application.Consts;
 using Application.Models;
+using Common.Infrastructure.AuthenticationAdapters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,16 +7,16 @@ namespace Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    public class TestController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        private readonly ILogger<WeatherForecastController> _logger;
+        private readonly ILogger<TestController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public TestController(ILogger<TestController> logger)
         {
             _logger = logger;
         }
