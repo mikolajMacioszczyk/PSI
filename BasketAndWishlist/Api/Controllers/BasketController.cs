@@ -1,4 +1,5 @@
 ﻿using Application.Requests.Baskets;
+using Application.Requests.Baskets.GetBasketById;
 using Application.Requests.Baskets.PopulateMockBasket;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -16,6 +17,11 @@ namespace Api.Controllers
         {
             _mediator = mediator;
         }
+
+        // TODO: Authorized
+        [HttpGet("{Id}")]
+        public Task<BasketResult?> GetBasketById([FromRoute] GetBasketByIdQuery query) =>
+            _mediator.Send(query);
 
         // TODO: Admin
         [HttpPost("populate")]

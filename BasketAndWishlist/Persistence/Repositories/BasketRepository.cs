@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Repositories;
 
@@ -16,5 +17,12 @@ public class BasketRepository : IBasketRepository
     {
         await _context.AddAsync(basket);
         return basket;
+    }
+
+    public Task<Basket?> GetByIdWithProducts(Guid id)
+    {
+        return _context.Baskets
+            .Include(b => b.ProductsInBaskets)
+            .FirstOrDefaultAsync(b => b.Id == id);
     }
 }
