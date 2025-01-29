@@ -12,7 +12,7 @@ namespace Persistence.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Purchase",
+                name: "Purchases",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -22,11 +22,11 @@ namespace Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Purchase", x => x.Id);
+                    table.PrimaryKey("PK_Purchases", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Shipment",
+                name: "Shipments",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -47,11 +47,11 @@ namespace Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Shipment", x => x.Id);
+                    table.PrimaryKey("PK_Shipments", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Order",
+                name: "Orders",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -67,22 +67,22 @@ namespace Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Order", x => x.Id);
+                    table.PrimaryKey("PK_Orders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Order_Purchase_PurchaseId",
+                        name: "FK_Orders_Purchases_PurchaseId",
                         column: x => x.PurchaseId,
-                        principalTable: "Purchase",
+                        principalTable: "Purchases",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Order_Shipment_ShipmentId",
+                        name: "FK_Orders_Shipments_ShipmentId",
                         column: x => x.ShipmentId,
-                        principalTable: "Shipment",
+                        principalTable: "Shipments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderStatusChangedNotification",
+                name: "OrderStatusChangedNotifications",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -95,30 +95,30 @@ namespace Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderStatusChangedNotification", x => x.Id);
+                    table.PrimaryKey("PK_OrderStatusChangedNotifications", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OrderStatusChangedNotification_Order_OrderId",
+                        name: "FK_OrderStatusChangedNotifications_Orders_OrderId",
                         column: x => x.OrderId,
-                        principalTable: "Order",
+                        principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Order_PurchaseId",
-                table: "Order",
+                name: "IX_Orders_PurchaseId",
+                table: "Orders",
                 column: "PurchaseId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Order_ShipmentId",
-                table: "Order",
+                name: "IX_Orders_ShipmentId",
+                table: "Orders",
                 column: "ShipmentId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderStatusChangedNotification_OrderId",
-                table: "OrderStatusChangedNotification",
+                name: "IX_OrderStatusChangedNotifications_OrderId",
+                table: "OrderStatusChangedNotifications",
                 column: "OrderId");
         }
 
@@ -126,16 +126,16 @@ namespace Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "OrderStatusChangedNotification");
+                name: "OrderStatusChangedNotifications");
 
             migrationBuilder.DropTable(
-                name: "Order");
+                name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "Purchase");
+                name: "Purchases");
 
             migrationBuilder.DropTable(
-                name: "Shipment");
+                name: "Shipments");
         }
     }
 }
