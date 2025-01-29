@@ -1,34 +1,25 @@
 using Application.Requests.Orders;
 using Application.Requests.Orders.CreateOrder;
+using Common.Api.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
-    [AllowAnonymous]
-    public class OrdersController : ControllerBase
+    public class OrdersController : BaseApiController
     {
-        private readonly IMediator _mediator;
-
-        public OrdersController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        public OrdersController(IMediator mediator) : base(mediator)
+        {}
 
         // TODO: Get order by id
         // TODO: Get my orders 
 
         // TODO: Payments
 
-        // TODO: Authorize
+        [AllowAnonymous]
         [HttpPost()]
-        public async Task<ActionResult<OrderResult>> CreateOrder([FromRoute] CreateOrderCommand command)
-        {
-            // TODO: Handle
-            return Ok(await _mediator.Send(command));
-        }
+        public Task<ActionResult<OrderResult>> CreateOrder([FromRoute] CreateOrderCommand command) =>
+            HandleRequest(command);
     }
 }

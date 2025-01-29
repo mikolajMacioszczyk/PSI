@@ -1,10 +1,11 @@
-﻿using MediatR;
+﻿using Common.Application.Models;
+using MediatR;
 
 namespace Application.Requests.Orders.CreateOrder;
 
-public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, OrderResult>
+public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Result<OrderResult>>
 {
-    public Task<OrderResult> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+    public Task<Result<OrderResult>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
         // TODO
         throw new NotImplementedException();

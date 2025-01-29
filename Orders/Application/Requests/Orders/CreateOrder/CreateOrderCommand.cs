@@ -1,7 +1,7 @@
-﻿using MediatR;
+﻿using Common.Application.Models;
+using MediatR;
 
 namespace Application.Requests.Orders.CreateOrder;
 
 // TODO: Fill
-// TODO: Result
-public record CreateOrderCommand(Guid BasketId) : IRequest<OrderResult>;
+public record CreateOrderCommand(Guid BasketId) : IRequest<Result<OrderResult>>;
