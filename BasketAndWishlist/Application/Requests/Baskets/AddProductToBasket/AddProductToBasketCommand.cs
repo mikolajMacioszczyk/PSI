@@ -1,5 +1,6 @@
-﻿using MediatR;
+﻿using Application.Models;
+using MediatR;
 
 namespace Application.Requests.Baskets.AddProductToBasket;
 
-public record AddProductToBasketCommand(Guid BasketId, Guid ProductInCatalogId) : IRequest<BasketResult>;
+public record AddProductToBasketCommand(Guid BasketId, Guid ProductInCatalogId) : IRequest<Result<BasketResult>>;

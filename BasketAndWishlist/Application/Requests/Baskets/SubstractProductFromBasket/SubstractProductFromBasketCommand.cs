@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Application.Models;
+using MediatR;
 
 namespace Application.Requests.Baskets.SubstractProductFromBasket;
-public record SubstractProductFromBasketCommand(Guid BasketId, Guid ProductInCatalogId) : IRequest<BasketResult>;
+public record SubstractProductFromBasketCommand(Guid BasketId, Guid ProductInCatalogId) : IRequest<Result<BasketResult>>;

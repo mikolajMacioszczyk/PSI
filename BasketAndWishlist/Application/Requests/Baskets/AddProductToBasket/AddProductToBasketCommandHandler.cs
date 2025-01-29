@@ -1,11 +1,13 @@
 ﻿using Application.Interfaces;
+using Application.Models;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
 
 namespace Application.Requests.Baskets.AddProductToBasket;
 
-public class AddProductToBasketCommandHandler : IRequestHandler<AddProductToBasketCommand, BasketResult>
+// TODO: Tests
+public class AddProductToBasketCommandHandler : IRequestHandler<AddProductToBasketCommand, Result<BasketResult>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
@@ -16,11 +18,16 @@ public class AddProductToBasketCommandHandler : IRequestHandler<AddProductToBask
         _mapper = mapper;
     }
 
-    public async Task<BasketResult> Handle(AddProductToBasketCommand request, CancellationToken cancellationToken)
+    public async Task<Result<BasketResult>> Handle(AddProductToBasketCommand request, CancellationToken cancellationToken)
     {
         var basket = await _unitOfWork.BasketRepository.GetByIdWithProducts(request.BasketId);
 
-        var existingProductEntry = basket!.ProductsInBaskets.FirstOrDefault(p => p.ProductInCatalogId == request.ProductInCatalogId);
+        if (basket is null)
+        {
+            return new NotFound(request.BasketId, $"Basket with provided id {request.BasketId} does not exists");
+        }
+
+        var existingProductEntry = basket.ProductsInBaskets.FirstOrDefault(p => p.ProductInCatalogId == request.ProductInCatalogId);
         if (existingProductEntry != null)
         {
             existingProductEntry.PieceCount += 1;
@@ -28,6 +35,7 @@ public class AddProductToBasketCommandHandler : IRequestHandler<AddProductToBask
         }
         else
         {
+            // TODO: Verify product exists, if not - return failure
             var newProductEntry = new ProductInBasket()
             {
                 Id = Guid.NewGuid(),

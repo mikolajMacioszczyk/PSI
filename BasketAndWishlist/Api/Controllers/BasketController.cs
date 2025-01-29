@@ -10,40 +10,34 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class BasketController : ControllerBase
+    public class BasketController : BaseApiController
     {
-        private readonly IMediator _mediator;
-
-        public BasketController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        public BasketController(IMediator mediator) : base(mediator)
+        {}
 
         // TODO: Authorized
         [HttpGet("{Id}")]
-        public Task<BasketResult?> GetBasketById([FromRoute] GetBasketByIdQuery query) =>
-            _mediator.Send(query);
+        public Task<ActionResult<BasketResult>> GetBasketById([FromRoute] GetBasketByIdQuery query) =>
+            HandleRequest(query);
 
         // TODO: Authorized
         [HttpPost()]
-        public Task<BasketResult> CreateEmptyBasket([FromBody] CreateEmptyBasketCommand command) =>
-            _mediator.Send(command);
+        public async Task<ActionResult<BasketResult>> CreateEmptyBasket([FromBody] CreateEmptyBasketCommand command) =>
+            Ok(await _mediator.Send(command));
 
         // TODO: Admin
         [HttpPost("populate")]
-        public Task<BasketResult> PopulateMockBasket([FromQuery] PopulateMockBasketCommand command) =>
-            _mediator.Send(command);
+        public async Task<ActionResult<BasketResult>> PopulateMockBasket([FromQuery] PopulateMockBasketCommand command) =>
+            Ok(await _mediator.Send(command));
 
         // TODO: Authorized
         [HttpPut("{BasketId}/product/{ProductInCatalogId}/add")]
-        public Task<BasketResult> AddProductToBasket([FromRoute] AddProductToBasketCommand command) =>
-            _mediator.Send(command);
+        public Task<ActionResult<BasketResult>> AddProductToBasket([FromRoute] AddProductToBasketCommand command) =>
+            HandleRequest(command);
 
         // TODO: Authorized
         [HttpPut("{BasketId}/product/{ProductInCatalogId}/substract")]
-        public Task<BasketResult> AddProductToBasket([FromRoute] SubstractProductFromBasketCommand command) =>
-            _mediator.Send(command);
+        public Task<ActionResult<BasketResult>> AddProductToBasket([FromRoute] SubstractProductFromBasketCommand command) =>
+            HandleRequest(command);
     }
 }
