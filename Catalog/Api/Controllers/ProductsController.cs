@@ -21,7 +21,7 @@ namespace Api.Controllers
         [HttpGet()]
         public async Task<IEnumerable<CatalogProductResult>> GetActiveProducts()
         {
-            return _mediator.Send(new GetActiveProductsQuery());
+            return await _mediator.Send(new GetActiveProductsQuery());
         }
     }
 }
