@@ -4,7 +4,6 @@ using AutoMapper;
 using MediatR;
 
 namespace Application.Requests.Baskets.SubstractProductFromBasket;
-// TODO: Tests
 public class SubstractProductFromBasketCommandHandler : IRequestHandler<SubstractProductFromBasketCommand, Result<BasketResult>>
 {
     private readonly IUnitOfWork _unitOfWork;

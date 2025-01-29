@@ -5,7 +5,6 @@ using MediatR;
 
 namespace Application.Requests.Baskets.GetBasketById;
 
-// TODO: Tests
 public class GetBasketByIdQueryHandler : IRequestHandler<GetBasketByIdQuery, Result<BasketResult>>
 {
     private readonly IUnitOfWork _unitOfWork;

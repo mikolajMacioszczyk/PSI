@@ -4,8 +4,6 @@ using Domain.Entities;
 using MediatR;
 
 namespace Application.Requests.Baskets.CreateOrGetBasket;
-
-// TODO: Tests
 public class CreateOrGetBasketCommandHandler : IRequestHandler<CreateOrGetBasketCommand, BasketResult>
 {
     private readonly IUnitOfWork _unitOfWork;

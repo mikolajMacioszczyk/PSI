@@ -56,7 +56,7 @@ public class AddProductToBasketCommandHandlerTests
         var productInCatalogId = Guid.NewGuid();
         var command = new AddProductToBasketCommand(basketId, productInCatalogId);
 
-        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = new List<ProductInBasket>() };
+        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = [] };
         
         var existingProduct = new ProductInBasket 
         {
