@@ -13,15 +13,15 @@ public class CatalogDbMigrator : IHostedService
         _services = services ?? throw new ArgumentNullException(nameof(services));
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         using (var scope = _services.CreateScope())
         {
             var ctx = scope.ServiceProvider.GetRequiredService<CatalogContext>();
-            ctx.Database.Migrate();
-        }
+            await ctx.Database.MigrateAsync();
 
-        return Task.CompletedTask;
+            await CatalogSeed.SeedDefaultProducts(ctx);
+        }
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

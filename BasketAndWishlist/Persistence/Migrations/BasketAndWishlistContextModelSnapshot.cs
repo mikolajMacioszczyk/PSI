@@ -28,12 +28,12 @@ namespace Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Basket");
+                    b.ToTable("Baskets");
                 });
 
             modelBuilder.Entity("Domain.Entities.ProductInBasket", b =>
@@ -55,7 +55,25 @@ namespace Persistence.Migrations
 
                     b.HasIndex("BasketId");
 
-                    b.ToTable("ProductInBasket");
+                    b.ToTable("ProductsInBaskets");
+                });
+
+            modelBuilder.Entity("Domain.Entities.WishList", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid[]>("ProductsInWishList")
+                        .IsRequired()
+                        .HasColumnType("uuid[]");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WishLists");
                 });
 
             modelBuilder.Entity("Domain.Entities.ProductInBasket", b =>

@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
@@ -12,6 +13,7 @@ public static class ServiceCollectionExtensions
     public static void AddApplicationDependencies(this IServiceCollection services)
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<ICatalogProductsService, HttpCatalogProductsService>();
     }
 
     public static void AddFluentValidators(this IServiceCollection services)

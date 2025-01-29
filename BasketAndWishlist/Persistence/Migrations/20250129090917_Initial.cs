@@ -12,19 +12,32 @@ namespace Persistence.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Basket",
+                name: "Baskets",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Basket", x => x.Id);
+                    table.PrimaryKey("PK_Baskets", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductInBasket",
+                name: "WishLists",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClientId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProductsInWishList = table.Column<Guid[]>(type: "uuid[]", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WishLists", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductsInBaskets",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -34,18 +47,18 @@ namespace Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductInBasket", x => x.Id);
+                    table.PrimaryKey("PK_ProductsInBaskets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductInBasket_Basket_BasketId",
+                        name: "FK_ProductsInBaskets_Baskets_BasketId",
                         column: x => x.BasketId,
-                        principalTable: "Basket",
+                        principalTable: "Baskets",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductInBasket_BasketId",
-                table: "ProductInBasket",
+                name: "IX_ProductsInBaskets_BasketId",
+                table: "ProductsInBaskets",
                 column: "BasketId");
         }
 
@@ -53,10 +66,13 @@ namespace Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ProductInBasket");
+                name: "ProductsInBaskets");
 
             migrationBuilder.DropTable(
-                name: "Basket");
+                name: "WishLists");
+
+            migrationBuilder.DropTable(
+                name: "Baskets");
         }
     }
 }
