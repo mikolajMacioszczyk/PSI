@@ -2,6 +2,7 @@ using Api.Extensions;
 using Application.Interfaces;
 using Application.Services;
 using FluentValidation.AspNetCore;
+using Infrastructure.AuthenticationAdapters;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using System.Reflection;
@@ -67,6 +68,9 @@ builder.Services.AddHttpClient<IBasketService, HttpBasketService>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("BasketAndWishlist")!);
 });
+
+// tokena validation
+builder.Services.AddKeycloakJwtAuthentication(builder, builder.Environment, withIntrospection: true);
 
 var app = builder.Build();
 
