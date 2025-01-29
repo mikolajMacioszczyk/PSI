@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Persistence.EntityConfigurations;
 
 namespace Persistence;
 
 public class CatalogContext : DbContext
 {
+    public DbSet<CatalogProduct> CatalogProducts { get; set; }
     public CatalogContext(DbContextOptions<CatalogContext> options) : base(options)
     {}
 
