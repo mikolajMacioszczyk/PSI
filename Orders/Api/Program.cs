@@ -1,5 +1,6 @@
 using Api.Extensions;
 using Application.Interfaces;
+using Application.Services;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -59,6 +60,12 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .SetIsOriginAllowed(origin => true);
     });
+});
+
+// httpClients
+builder.Services.AddHttpClient<IBasketService, HttpBasketService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("BasketAndWishlist")!);
 });
 
 var app = builder.Build();
