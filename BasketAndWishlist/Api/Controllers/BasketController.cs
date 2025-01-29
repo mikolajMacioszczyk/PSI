@@ -1,6 +1,6 @@
 ﻿using Application.Requests.Baskets;
 using Application.Requests.Baskets.AddProductToBasket;
-using Application.Requests.Baskets.CreateEmptyBasket;
+using Application.Requests.Baskets.CreateOrGetBasket;
 using Application.Requests.Baskets.GetBasketById;
 using Application.Requests.Baskets.PopulateMockBasket;
 using Application.Requests.Baskets.SubstractProductFromBasket;
@@ -22,7 +22,7 @@ namespace Api.Controllers
 
         // TODO: Authorized
         [HttpPost()]
-        public async Task<ActionResult<BasketResult>> CreateEmptyBasket([FromBody] CreateEmptyBasketCommand command) =>
+        public async Task<ActionResult<BasketResult>> CreateOrGetBasket([FromBody] CreateOrGetBasketCommand command) =>
             Ok(await _mediator.Send(command));
 
         // TODO: Admin

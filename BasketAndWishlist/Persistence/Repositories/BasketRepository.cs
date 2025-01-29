@@ -25,4 +25,11 @@ public class BasketRepository : IBasketRepository
             .Include(b => b.ProductsInBaskets)
             .FirstOrDefaultAsync(b => b.Id == id);
     }
+
+    public Task<Basket?> GetByUserIdWithProducts(Guid userId)
+    {
+        return _context.Baskets
+            .Include(b => b.ProductsInBaskets)
+            .FirstOrDefaultAsync(b => b.UserId == userId);
+    }
 }

@@ -6,5 +6,6 @@ namespace Application.Interfaces
     {
         Task<Basket> CreateAsync(Basket basket);
         Task<Basket?> GetByIdWithProducts(Guid id);
+        Task<Basket?> GetByUserIdWithProducts(Guid userId);
     }
 }
