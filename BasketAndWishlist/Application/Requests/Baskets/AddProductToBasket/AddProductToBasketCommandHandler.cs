@@ -6,7 +6,6 @@ using MediatR;
 
 namespace Application.Requests.Baskets.AddProductToBasket;
 
-// TODO: Tests
 public class AddProductToBasketCommandHandler : IRequestHandler<AddProductToBasketCommand, Result<BasketResult>>
 {
     private readonly IUnitOfWork _unitOfWork;
