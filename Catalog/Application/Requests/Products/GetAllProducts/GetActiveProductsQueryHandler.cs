@@ -18,7 +18,8 @@ namespace Application.Requests.Products.GetAllProducts
 
         public async Task<PagedResultBase<CatalogProductResult>> Handle(GetActiveProductsQuery request, CancellationToken cancellationToken)
         {
-            var (catalogProducts, totalCount) = await _unitOfWork.CatalogProductRepository.GetPaged((int)request.PageNumber, (int)request.PageSize);
+            var (catalogProducts, totalCount) = await _unitOfWork.CatalogProductRepository
+                .GetPaged((int)request.PageNumber, (int)request.PageSize, p => p.InCatalogToTimestamp == null || p.InCatalogToTimestamp < DateTime.UtcNow);
             var items = _mapper.Map<IEnumerable<CatalogProductResult>>(catalogProducts);
             return new PagedResultBase<CatalogProductResult>(items.ToList(), (uint)totalCount, request.PageSize, request.PageNumber);
         }

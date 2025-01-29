@@ -10,11 +10,13 @@ namespace Application.Requests.Baskets.AddProductToBasket;
 public class AddProductToBasketCommandHandler : IRequestHandler<AddProductToBasketCommand, Result<BasketResult>>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICatalogProductsService _catalogProductsService;
     private readonly IMapper _mapper;
 
-    public AddProductToBasketCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+    public AddProductToBasketCommandHandler(IUnitOfWork unitOfWork, ICatalogProductsService catalogProductsService, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
+        _catalogProductsService = catalogProductsService;
         _mapper = mapper;
     }
 
@@ -35,7 +37,11 @@ public class AddProductToBasketCommandHandler : IRequestHandler<AddProductToBask
         }
         else
         {
-            // TODO: Verify product exists, if not - return failure
+            if (await _catalogProductsService.GetCatalogProductById(request.ProductInCatalogId) is null)
+            {
+                return new Failure($"Catalog product with provided id {request.ProductInCatalogId} not exists");
+            }
+
             var newProductEntry = new ProductInBasket()
             {
                 Id = Guid.NewGuid(),
