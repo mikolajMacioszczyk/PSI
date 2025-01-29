@@ -1,4 +1,5 @@
-﻿using Application.Requests.Products;
+﻿using Application.Models;
+using Application.Requests.Products;
 using Application.Requests.Products.GetAllProducts;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -19,7 +20,7 @@ namespace Api.Controllers
         }
 
         [HttpGet()]
-        public Task<IEnumerable<CatalogProductResult>> GetActiveProducts() =>
-            _mediator.Send(new GetActiveProductsQuery());
+        public Task<PagedResultBase<CatalogProductResult>> GetActiveProducts([FromQuery] GetActiveProductsQuery query) =>
+            _mediator.Send(query);
     }
 }

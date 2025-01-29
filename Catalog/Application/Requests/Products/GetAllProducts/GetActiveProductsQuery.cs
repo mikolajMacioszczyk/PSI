@@ -1,5 +1,6 @@
-﻿using MediatR;
+﻿using Application.Models;
+using MediatR;
 
 namespace Application.Requests.Products.GetAllProducts;
 
-public record GetActiveProductsQuery : IRequest<IEnumerable<CatalogProductResult>>;
+public record GetActiveProductsQuery : PagedResultQueryBase, IRequest<PagedResultBase<CatalogProductResult>>;

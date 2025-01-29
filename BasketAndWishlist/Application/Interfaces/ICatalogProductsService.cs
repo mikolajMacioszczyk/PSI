@@ -4,5 +4,5 @@ namespace Application.Interfaces;
 
 public interface ICatalogProductsService
 {
-    Task<ICollection<CatalogProduct>> GetActiveCatalogProducts(); 
+    Task<ICollection<CatalogProduct>> GetActiveCatalogProducts(uint pageSize, uint pageNumber); 
 }

@@ -1,4 +1,5 @@
 ﻿using Application.Requests.Baskets;
+using Application.Requests.Baskets.CreateEmptyBasket;
 using Application.Requests.Baskets.GetBasketById;
 using Application.Requests.Baskets.PopulateMockBasket;
 using MediatR;
@@ -22,6 +23,13 @@ namespace Api.Controllers
         [HttpGet("{Id}")]
         public Task<BasketResult?> GetBasketById([FromRoute] GetBasketByIdQuery query) =>
             _mediator.Send(query);
+
+        // TODO: Authorized
+        [HttpPost()]
+        public Task<BasketResult> CreateEmptyBasket([FromBody] CreateEmptyBasketCommand command) =>
+            _mediator.Send(command);
+
+        // TODO: Add product to basket
 
         // TODO: Admin
         [HttpPost("populate")]

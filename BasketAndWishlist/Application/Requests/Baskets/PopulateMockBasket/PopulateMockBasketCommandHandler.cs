@@ -27,7 +27,7 @@ public class PopulateMockBasketCommandHandler : IRequestHandler<PopulateMockBask
             ProductsInBaskets = []
         };
 
-        var allActiveCatalogProducts = await _catalogProductsService.GetActiveCatalogProducts();
+        var allActiveCatalogProducts = await _catalogProductsService.GetActiveCatalogProducts(pageSize: 100, pageNumber: 1);
 
         var randomProducts = allActiveCatalogProducts.OrderBy(x => random.Next()).Take((int)request.ProductsCount).ToList();
 

@@ -17,4 +17,13 @@ public class CatalogProductRepository : ICatalogProductRepository
     {
         return await _context.CatalogProducts.ToListAsync();
     }
+
+    public async Task<(ICollection<CatalogProduct>, int totalCount)> GetPaged(int pageNumber, int pageSize)
+    {
+        var totalCount = await _context.CatalogProducts.CountAsync();
+
+        var pagedCollection = await _context.CatalogProducts.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+        return (pagedCollection, totalCount);
+    }
 }

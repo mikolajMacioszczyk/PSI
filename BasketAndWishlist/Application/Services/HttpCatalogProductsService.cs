@@ -14,9 +14,9 @@ public class HttpCatalogProductsService : ICatalogProductsService
         _httpClient = httpClient;
     }
 
-    public async Task<ICollection<CatalogProduct>> GetActiveCatalogProducts()
+    public async Task<ICollection<CatalogProduct>> GetActiveCatalogProducts(uint pageSize, uint pageNumber)
     {
-        var productsResponse = await _httpClient.GetAsync("products");
+        var productsResponse = await _httpClient.GetAsync($"products?pageSize={pageSize}&pageNumber={pageNumber}");
         productsResponse.EnsureSuccessStatusCode();
 
         var responseContent = await productsResponse.Content.ReadAsStringAsync();

@@ -1,10 +1,11 @@
 ﻿using Application.Interfaces;
+using Application.Models;
 using AutoMapper;
 using MediatR;
 
 namespace Application.Requests.Products.GetAllProducts
 {
-    public class GetActiveProductsQueryHandler : IRequestHandler<GetActiveProductsQuery, IEnumerable<CatalogProductResult>>
+    public class GetActiveProductsQueryHandler : IRequestHandler<GetActiveProductsQuery, PagedResultBase<CatalogProductResult>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -15,10 +16,11 @@ namespace Application.Requests.Products.GetAllProducts
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<CatalogProductResult>> Handle(GetActiveProductsQuery request, CancellationToken cancellationToken)
+        public async Task<PagedResultBase<CatalogProductResult>> Handle(GetActiveProductsQuery request, CancellationToken cancellationToken)
         {
-            var catalogProducts = await _unitOfWork.CatalogProductRepository.GetAll();
-            return _mapper.Map<IEnumerable<CatalogProductResult>>(catalogProducts);
+            var (catalogProducts, totalCount) = await _unitOfWork.CatalogProductRepository.GetPaged((int)request.PageNumber, (int)request.PageSize);
+            var items = _mapper.Map<IEnumerable<CatalogProductResult>>(catalogProducts);
+            return new PagedResultBase<CatalogProductResult>(items.ToList(), (uint)totalCount, request.PageSize, request.PageNumber);
         }
     }
 }
