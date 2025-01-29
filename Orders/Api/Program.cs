@@ -1,6 +1,7 @@
 using Api.Extensions;
 using Application.Interfaces;
 using FluentValidation.AspNetCore;
+using Infrastructure.AuthenticationAdapters;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using System.Reflection;
@@ -60,6 +61,9 @@ builder.Services.AddCors(options =>
             .SetIsOriginAllowed(origin => true);
     });
 });
+
+// tokena validation
+builder.Services.AddKeycloakJwtAuthentication(builder, builder.Environment, withIntrospection: true);
 
 var app = builder.Build();
 
