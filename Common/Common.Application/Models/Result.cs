@@ -1,4 +1,4 @@
-﻿namespace Application.Models;
+﻿namespace Common.Application.Models;
 public struct Result<T>
 {
     public T? Value { get; private set; }

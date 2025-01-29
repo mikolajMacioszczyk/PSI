@@ -4,6 +4,8 @@ using Application.Requests.Baskets.CreateOrGetBasket;
 using Application.Requests.Baskets.GetBasketById;
 using Application.Requests.Baskets.PopulateMockBasket;
 using Application.Requests.Baskets.SubstractProductFromBasket;
+using Common.Api.Controllers;
+using Common.Infrastructure.AuthenticationAdapters;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,27 +17,27 @@ namespace Api.Controllers
         public BasketController(IMediator mediator) : base(mediator)
         {}
 
-        // TODO: Authorized
+        [AllowAnonymous]
         [HttpGet("{Id}")]
         public Task<ActionResult<BasketResult>> GetBasketById([FromRoute] GetBasketByIdQuery query) =>
             HandleRequest(query);
 
-        // TODO: Authorized
+        [AllowAnonymous]
         [HttpPost()]
         public async Task<ActionResult<BasketResult>> CreateOrGetBasket([FromBody] CreateOrGetBasketCommand command) =>
             Ok(await _mediator.Send(command));
 
-        // TODO: Admin
+        [Authorize(Roles = RoleNames.Admin)]
         [HttpPost("populate")]
         public async Task<ActionResult<BasketResult>> PopulateMockBasket([FromQuery] PopulateMockBasketCommand command) =>
             Ok(await _mediator.Send(command));
 
-        // TODO: Authorized
+        [AllowAnonymous]
         [HttpPut("{BasketId}/product/{ProductInCatalogId}/add")]
         public Task<ActionResult<BasketResult>> AddProductToBasket([FromRoute] AddProductToBasketCommand command) =>
             HandleRequest(command);
 
-        // TODO: Authorized
+        [AllowAnonymous]
         [HttpPut("{BasketId}/product/{ProductInCatalogId}/substract")]
         public Task<ActionResult<BasketResult>> AddProductToBasket([FromRoute] SubstractProductFromBasketCommand command) =>
             HandleRequest(command);

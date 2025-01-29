@@ -1,4 +1,4 @@
-﻿using Application.Models;
+﻿using Common.Application.Models;
 using MediatR;
 
 namespace Application.Requests.Baskets.GetBasketById;

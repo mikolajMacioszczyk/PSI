@@ -1,4 +1,4 @@
-﻿namespace Application.Models;
+﻿namespace Common.Application.Models;
 public class Failure
 {
     public string Message { get; init; }

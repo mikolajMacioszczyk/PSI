@@ -1,4 +1,4 @@
-﻿namespace Application.Models;
+﻿namespace Common.Application.Models;
 public class NotFound
 {
     public string Identifier { get; init; }

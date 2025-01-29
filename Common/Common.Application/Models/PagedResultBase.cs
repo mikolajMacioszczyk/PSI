@@ -1,4 +1,4 @@
-﻿namespace Application.Models;
+﻿namespace Common.Application.Models;
 
 public class PagedResultBase<T>
 {
@@ -14,9 +14,9 @@ public class PagedResultBase<T>
         ItemsCount = itemsCount;
         ItemsFrom = pageSize * (pageNumber - 1) + 1;
         ItemsTo = Math.Min(ItemsFrom + pageSize - 1, itemsCount);
-        PagesCount = (uint) Math.Ceiling(itemsCount / (double)pageSize);
+        PagesCount = (uint)Math.Ceiling(itemsCount / (double)pageSize);
     }
 
     public PagedResultBase()
-    {}
+    { }
 }
