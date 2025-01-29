@@ -1,6 +1,10 @@
-﻿namespace Application.Requests.Baskets;
+﻿using Application.Requests.ProductInBaskets;
+
+namespace Application.Requests.Baskets;
 
 public class BasketResult
 {
-    // TODO
+    public Guid Id { get; set; }
+    public Guid? UserId { get; set; }
+    public ICollection<ProductInBasketResult> ProductsInBaskets { get; set; } = [];
 }
