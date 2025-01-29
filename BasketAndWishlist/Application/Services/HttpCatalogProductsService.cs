@@ -20,7 +20,8 @@ public class HttpCatalogProductsService : ICatalogProductsService
         productsResponse.EnsureSuccessStatusCode();
 
         var responseContent = await productsResponse.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<ICollection<CatalogProduct>>(responseContent, SerializerOptions.Value) ?? [];
+        var pagedCollection = JsonSerializer.Deserialize<PagedResultBase<CatalogProduct>>(responseContent, SerializerOptions.Value);
+        return pagedCollection?.Items ?? [];
     }
 
     private static readonly Lazy<JsonSerializerOptions> SerializerOptions = new(InitializeSerializerOptions());

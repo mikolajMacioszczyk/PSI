@@ -8,11 +8,13 @@ public class UnitOfWork : IUnitOfWork
     private readonly BasketAndWishlistContext _context;
 
     public IBasketRepository BasketRepository { get; }
+    public IProductInBasketRepository ProductInBasketRepository { get; }
 
     public UnitOfWork(BasketAndWishlistContext context)
     {
         _context = context;
         BasketRepository = new BasketRepository(context);
+        ProductInBasketRepository = new ProductInBasketRepository(context);
     }
 
     public event EventHandler? BeforeSaveChanges;
