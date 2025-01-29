@@ -3,6 +3,7 @@ using Application.Requests.Baskets.AddProductToBasket;
 using Application.Requests.Baskets.CreateEmptyBasket;
 using Application.Requests.Baskets.GetBasketById;
 using Application.Requests.Baskets.PopulateMockBasket;
+using Application.Requests.Baskets.SubstractProductFromBasket;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,8 +37,13 @@ namespace Api.Controllers
             _mediator.Send(command);
 
         // TODO: Authorized
-        [HttpPut("{BasketId}")]
-        public Task<BasketResult> AddProductToBasket([FromBody] AddProductToBasketCommand command) =>
+        [HttpPut("{BasketId}/product/{ProductInCatalogId}/add")]
+        public Task<BasketResult> AddProductToBasket([FromRoute] AddProductToBasketCommand command) =>
+            _mediator.Send(command);
+
+        // TODO: Authorized
+        [HttpPut("{BasketId}/product/{ProductInCatalogId}/substract")]
+        public Task<BasketResult> AddProductToBasket([FromRoute] SubstractProductFromBasketCommand command) =>
             _mediator.Send(command);
     }
 }

@@ -23,4 +23,9 @@ public class ProductInBasketRepository : IProductInBasketRepository
         _context.Update(productInBasket);
         return productInBasket;
     }
+
+    public void Remove(ProductInBasket productInBasket)
+    {
+        _context.Remove(productInBasket);
+    }
 }
