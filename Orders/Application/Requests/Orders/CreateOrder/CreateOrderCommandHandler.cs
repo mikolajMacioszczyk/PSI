@@ -17,6 +17,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
     private readonly IOrderPriceService _orderPriceService;
     private readonly IOrderNumberService _orderNumberService;
     private readonly IShipmentPriceService _shipmentPriceService;
+    private readonly IIdentityService _identityService;
     private readonly IMapper _mapper;
 
     public CreateOrderCommandHandler(
@@ -26,6 +27,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
         IOrderPriceService orderPriceService,
         IOrderNumberService orderNumberService,
         IShipmentPriceService shipmentPriceService,
+        IIdentityService identityService,
         IMapper mapper)
     {
         _unitOfWork = unitOfWork;
@@ -34,6 +36,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
         _orderPriceService = orderPriceService;
         _orderNumberService = orderNumberService;
         _shipmentPriceService = shipmentPriceService;
+        _identityService = identityService;
         _mapper = mapper;
     }
 
@@ -46,6 +49,11 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
             return new Failure($"Basket with provided id {request.BasketId} not exists");
         }
 
+        if (basket.UserId != _identityService.TryGetUserId())
+        {
+            return new Failure($"Basket is owned by other user");
+        }
+
         // TODO: Validate shipment provider
 
         var shipment = _mapper.Map<Shipment>(request);
@@ -56,7 +64,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
         {
             Id = Guid.NewGuid(),
             BasketId = basket.Id,
-            ClientId = GetClientId(basket),
+            ClientId = GetClientId(),
             ShipmentId = shipment.Id,
             Shipment = shipment,
             OrderNumber = await _orderNumberService.GetNext(),
@@ -74,5 +82,5 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
         return _mapper.Map<OrderResult>(order);
     }
 
-    private static Guid GetClientId(Basket basket) => basket.UserId ?? Guid.NewGuid();
+    private Guid GetClientId() => _identityService.TryGetUserId() ?? Guid.NewGuid();
 }

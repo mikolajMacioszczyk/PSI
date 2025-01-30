@@ -1,4 +1,5 @@
-﻿using IdentityModel.Client;
+﻿using Common.Infrastructure.AuthenticationAdapters;
+using IdentityModel.Client;
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Common;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -62,8 +63,8 @@ namespace Infrastructure.AuthenticationAdapters
                 // Ensures that "roles" claim type received in Access Token from Azure AD
                 // will be used in Authorize attribute eg. [Authorize(Roles = "Admin")]
                 // or ClaimsPrincipal user.IsInRole("Admin")
-                RoleClaimType = "appRole",
-                NameClaimType = "name",
+                RoleClaimType = KeycloakClaims.RoleClaimType,
+                NameClaimType = KeycloakClaims.NameClaimType,
             };
 
             jwtBearerOptions.Events = new JwtBearerEvents()

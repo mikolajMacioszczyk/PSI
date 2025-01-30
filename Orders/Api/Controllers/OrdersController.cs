@@ -21,7 +21,6 @@ namespace Api.Controllers
         public Task<ActionResult<OrderResult>> GetOrderById([FromRoute] GetOrderByIdQuery query) =>
             HandleRequest(query);
 
-        // TODO: IIdentityService
         [Authorize(Roles = RoleNames.Customer)]
         [HttpGet("history")]
         public Task<ActionResult<PagedResultBase<OrderResult>>> GetOrderHistory([FromQuery] GetOrderHistoryQuery query) =>

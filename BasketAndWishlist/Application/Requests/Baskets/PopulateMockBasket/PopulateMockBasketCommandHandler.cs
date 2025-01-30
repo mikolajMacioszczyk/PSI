@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using AutoMapper;
+using Common.Application.Interfaces;
 using Domain.Entities;
 using MediatR;
 
@@ -10,13 +11,19 @@ public class PopulateMockBasketCommandHandler : IRequestHandler<PopulateMockBask
     private static readonly Random random = new ();
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICatalogProductsService _catalogProductsService;
+    private readonly IIdentityService _identityService;
     private readonly IMapper _mapper;
 
-    public PopulateMockBasketCommandHandler(IUnitOfWork unitOfWork, ICatalogProductsService catalogProductsService, IMapper mapper)
+    public PopulateMockBasketCommandHandler(
+        IUnitOfWork unitOfWork, 
+        ICatalogProductsService catalogProductsService, 
+        IMapper mapper, 
+        IIdentityService identityService)
     {
         _unitOfWork = unitOfWork;
         _catalogProductsService = catalogProductsService;
         _mapper = mapper;
+        _identityService = identityService;
     }
 
     public async Task<BasketResult> Handle(PopulateMockBasketCommand request, CancellationToken cancellationToken)
@@ -24,6 +31,7 @@ public class PopulateMockBasketCommandHandler : IRequestHandler<PopulateMockBask
         var basket = new Basket()
         {
             Id = Guid.NewGuid(),
+            UserId = _identityService.UserId,
             ProductsInBaskets = []
         };
 

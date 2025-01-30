@@ -4,6 +4,7 @@ using Application.Requests.Baskets;
 using AutoMapper;
 using Domain.Entities;
 using Moq;
+using Common.Application.Interfaces;
 
 namespace UnitTests.Requests.Handlers;
 public class CreateOrGetBasketCommandHandlerTests
@@ -11,12 +12,13 @@ public class CreateOrGetBasketCommandHandlerTests
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
     private readonly Mock<IBasketRepository> _basketRepositoryMock = new();
     private readonly Mock<IMapper> _mapperMock = new();
+    private readonly Mock<IIdentityService> _identityServiceMock = new();
     private readonly CreateOrGetBasketCommandHandler _handler;
 
     public CreateOrGetBasketCommandHandlerTests()
     {
         _unitOfWorkMock.Setup(m => m.BasketRepository).Returns(_basketRepositoryMock.Object);
-        _handler = new CreateOrGetBasketCommandHandler(_unitOfWorkMock.Object, _mapperMock.Object);
+        _handler = new CreateOrGetBasketCommandHandler(_unitOfWorkMock.Object, _mapperMock.Object, _identityServiceMock.Object);
     }
 
     [Fact]
@@ -24,12 +26,16 @@ public class CreateOrGetBasketCommandHandlerTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var command = new CreateOrGetBasketCommand(userId);
+        var command = new CreateOrGetBasketCommand();
         var existingBasket = new Basket { Id = Guid.NewGuid(), UserId = userId, ProductsInBaskets = [] };
         var expectedBasketResult = new BasketResult();
 
         _basketRepositoryMock.Setup(m => m.GetByUserIdWithProducts(userId))
             .ReturnsAsync(existingBasket);
+
+        _identityServiceMock.Setup(m => m.TryGetUserId())
+            .Returns(userId)
+            .Verifiable();
 
         _mapperMock.Setup(m => m.Map<BasketResult>(existingBasket))
             .Returns(expectedBasketResult);
@@ -40,6 +46,7 @@ public class CreateOrGetBasketCommandHandlerTests
         // Assert
         Assert.Equal(expectedBasketResult, result);
         _basketRepositoryMock.Verify(m => m.GetByUserIdWithProducts(userId), Times.Once);
+        _identityServiceMock.Verify();
     }
 
     [Fact]
@@ -47,7 +54,7 @@ public class CreateOrGetBasketCommandHandlerTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var command = new CreateOrGetBasketCommand(userId);
+        var command = new CreateOrGetBasketCommand();
         Basket? createdBasket = null;
         var expectedBasketResult = new BasketResult();
 
@@ -56,6 +63,10 @@ public class CreateOrGetBasketCommandHandlerTests
         
         _basketRepositoryMock.Setup(m => m.CreateAsync(It.IsAny<Basket>()))
             .Callback<Basket>(b => createdBasket = b)!.ReturnsAsync(createdBasket);
+
+        _identityServiceMock.Setup(m => m.TryGetUserId())
+            .Returns(userId)
+            .Verifiable();
 
         _unitOfWorkMock.Setup(m => m.SaveChangesAsync());
 
@@ -72,18 +83,23 @@ public class CreateOrGetBasketCommandHandlerTests
 
         _basketRepositoryMock.Verify(m => m.CreateAsync(It.IsAny<Basket>()), Times.Once);
         _unitOfWorkMock.Verify(m => m.SaveChangesAsync(), Times.Once);
+        _identityServiceMock.Verify();
     }
 
     [Fact]
     public async Task Handle_NoUserId_CreatesNewBasket()
     {
         // Arrange
-        var command = new CreateOrGetBasketCommand(null);
+        var command = new CreateOrGetBasketCommand();
         Basket? createdBasket = null;
         var expectedBasketResult = new BasketResult();
 
         _basketRepositoryMock.Setup(m => m.CreateAsync(It.IsAny<Basket>()))
             .Callback<Basket>(b => createdBasket = b)!.ReturnsAsync(createdBasket);
+
+        _identityServiceMock.Setup(m => m.TryGetUserId())
+            .Returns((Guid?)null)
+            .Verifiable();
 
         _unitOfWorkMock.Setup(m => m.SaveChangesAsync());
 
@@ -100,5 +116,6 @@ public class CreateOrGetBasketCommandHandlerTests
 
         _basketRepositoryMock.Verify(m => m.CreateAsync(It.IsAny<Basket>()), Times.Once);
         _unitOfWorkMock.Verify(m => m.SaveChangesAsync(), Times.Once);
+        _identityServiceMock.Verify();
     }
 }
