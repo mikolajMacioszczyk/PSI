@@ -19,7 +19,7 @@ namespace Api.Controllers
 
         [AllowAnonymous]
         [HttpPost()]
-        public Task<ActionResult<OrderResult>> CreateOrder([FromRoute] CreateOrderCommand command) =>
+        public Task<ActionResult<OrderResult>> CreateOrder([FromBody] CreateOrderCommand command) =>
             HandleRequest(command);
     }
 }

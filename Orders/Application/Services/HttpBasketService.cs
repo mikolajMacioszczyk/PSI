@@ -1,6 +1,5 @@
 ﻿using Application.Interfaces;
 using Application.Models;
-using System.Net.Http;
 using System.Net;
 using System.Text.Json.Serialization;
 using System.Text.Json;
@@ -16,7 +15,7 @@ public class HttpBasketService : IBasketService
         _httpClient = httpClient;
     }
 
-    public async Task<Basket?> GetBasketById(string basketId)
+    public async Task<Basket?> GetBasketById(Guid basketId)
     {
         var productResponse = await _httpClient.GetAsync($"Basket/{basketId}");
 

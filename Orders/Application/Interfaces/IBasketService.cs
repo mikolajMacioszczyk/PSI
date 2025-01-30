@@ -4,5 +4,5 @@ namespace Application.Interfaces;
 
 public interface IBasketService
 {
-    Task<Basket?> GetBasketById(string basketId);
+    Task<Basket?> GetBasketById(Guid basketId);
 }
