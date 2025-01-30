@@ -1,5 +1,6 @@
 using Application.Requests.Orders;
 using Application.Requests.Orders.CreateOrder;
+using Application.Requests.Orders.GetOrderById;
 using Common.Api.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +13,11 @@ namespace Api.Controllers
         public OrdersController(IMediator mediator) : base(mediator)
         {}
 
-        // TODO: Get order by id
+        [AllowAnonymous]
+        [HttpGet("{Id}")]
+        public Task<ActionResult<OrderResult>> GetOrderById([FromRoute] GetOrderByIdQuery query) =>
+            HandleRequest(query);
+
         // TODO: Get my orders 
 
         // TODO: Payments

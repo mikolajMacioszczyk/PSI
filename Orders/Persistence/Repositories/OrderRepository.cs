@@ -13,6 +13,13 @@ public class OrderRepository : IOrderRepository
         _context = context;
     }
 
+    public Task<Order?> GetByIdWithShipment(Guid orderId)
+    {
+        return _context.Orders
+            .Include(o => o.Shipment)
+            .FirstOrDefaultAsync(o => o.Id == orderId);
+    }
+
     public async Task<Order> CreateAsync(Order order)
     {
         await _context.AddAsync(order);
