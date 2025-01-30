@@ -37,6 +37,8 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
             return new Failure($"Basket with provided id {request.BasketId} not exists");
         }
 
+        // TODO: Validate shipment provider
+
         var shipment = new Shipment
         {
             Id = Guid.NewGuid(),
@@ -52,7 +54,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
             HomeNumber = request.HomeNumber,
             PhoneNumber = request.PhoneNumber,
             AreaCode = request.AreaCode,
-            TrackingLink = request.TrackingLink
+            TrackingLink = string.Empty
         };
 
         var order = new Order

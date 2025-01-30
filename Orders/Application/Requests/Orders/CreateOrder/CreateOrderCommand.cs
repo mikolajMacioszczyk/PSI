@@ -16,7 +16,6 @@ public record CreateOrderCommand(
     string PostalCode,
     int HomeNumber,
     string PhoneNumber,
-    string AreaCode,
-    string TrackingLink
+    string AreaCode
     ) 
     : IRequest<Result<OrderResult>>;
