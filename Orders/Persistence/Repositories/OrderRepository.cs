@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Repositories;
 
@@ -16,5 +17,10 @@ public class OrderRepository : IOrderRepository
     {
         await _context.AddAsync(order);
         return order;
+    }
+
+    public Task<Order?> GetNewestOrder()
+    {
+        return _context.Orders.OrderByDescending(o => o.SubmitionTimestamp).FirstOrDefaultAsync();
     }
 }

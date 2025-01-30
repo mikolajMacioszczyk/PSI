@@ -18,6 +18,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IBasketService, HttpBasketService>();
         services.AddScoped<IDateTimeProvider, DateTimeProvider>();
+        services.AddScoped<IOrderPriceService, OrderPriceService>();
+        services.AddScoped<IOrderNumberService, OrderNumberService>();
+        services.AddScoped<IShipmentPriceService, ShipmentPriceService>();
     }
 
     public static void AddFluentValidators(this IServiceCollection services)
