@@ -26,8 +26,6 @@ namespace Api.Controllers
         public Task<ActionResult<PagedResultBase<OrderResult>>> GetOrderHistory([FromQuery] GetOrderHistoryQuery query) =>
             HandleRequest(query);
 
-        // TODO: Get my orders 
-
         [AllowAnonymous]
         [HttpPost()]
         public Task<ActionResult<OrderResult>> CreateOrder([FromBody] CreateOrderCommand command) =>

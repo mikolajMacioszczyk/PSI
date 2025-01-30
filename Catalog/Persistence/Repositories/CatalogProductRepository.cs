@@ -25,7 +25,7 @@ public class CatalogProductRepository : ICatalogProductRepository
 
         var totalCount = await query.CountAsync();
 
-        var pagedCollection = await _context.CatalogProducts.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+        var pagedCollection = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
         return (pagedCollection, totalCount);
     }

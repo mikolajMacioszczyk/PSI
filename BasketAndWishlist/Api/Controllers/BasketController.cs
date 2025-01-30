@@ -23,6 +23,11 @@ namespace Api.Controllers
             HandleRequest(query);
 
         [AllowAnonymous]
+        [HttpPost("guest")]
+        public async Task<ActionResult<BasketResult>> CreateEmptyBasket([FromBody] CreateOrGetBasketCommand command) =>
+            Ok(await _mediator.Send(command));
+
+        [Authorize]
         [HttpPost()]
         public async Task<ActionResult<BasketResult>> CreateOrGetBasket([FromBody] CreateOrGetBasketCommand command) =>
             Ok(await _mediator.Send(command));
