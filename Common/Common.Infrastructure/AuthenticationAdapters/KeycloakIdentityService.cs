@@ -23,8 +23,6 @@ public class KeycloakIdentityService : IIdentityService
 
     public bool IsInRole(string roleName) => _httpContext.User.IsInRole(roleName);
 
-    public Guid? TryGetUserId()
-    {
-        return IsAuthenticated ? UserId : null;
-    }
+    public Guid? TryGetUserId() =>
+        Guid.TryParse(_httpContext.User.FindFirst(KeycloakClaims.IdClaimType)?.Value, out Guid id) ? id : null;
 }

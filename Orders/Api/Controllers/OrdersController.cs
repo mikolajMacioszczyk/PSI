@@ -28,8 +28,6 @@ namespace Api.Controllers
 
         // TODO: Get my orders 
 
-        // TODO: Payments
-
         [AllowAnonymous]
         [HttpPost()]
         public Task<ActionResult<OrderResult>> CreateOrder([FromBody] CreateOrderCommand command) =>

@@ -5,10 +5,11 @@ namespace Application.Services;
 
 public class OrderPriceService : IOrderPriceService
 {
-    public async Task<decimal> GetOrderPrice(Basket basket)
+    public Task<decimal> GetOrderPrice(Basket basket)
     {
         var productsInCatalogIds = basket.ProductsInBaskets.Select(p => p.ProductInCatalogId).ToList();
         // TODO
-        return basket.ProductsInBaskets.Sum(p => p.PieceCount);
+        var result = (decimal) basket.ProductsInBaskets.Sum(p => p.PieceCount);
+        return Task.FromResult(result);
     }
 }

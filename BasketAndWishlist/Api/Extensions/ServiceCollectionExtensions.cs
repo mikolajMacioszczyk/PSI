@@ -16,6 +16,8 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ICatalogProductsService, HttpCatalogProductsService>();
+
+        services.AddHttpContextAccessor();
         services.AddScoped<IIdentityService, KeycloakIdentityService>();
     }
 

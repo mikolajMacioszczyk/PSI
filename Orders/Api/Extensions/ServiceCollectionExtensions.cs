@@ -17,7 +17,10 @@ public static class ServiceCollectionExtensions
     public static void AddApplicationDependencies(this IServiceCollection services)
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        services.AddHttpContextAccessor();
         services.AddScoped<IIdentityService, KeycloakIdentityService>();
+        
         services.AddScoped<IBasketService, HttpBasketService>();
         services.AddScoped<IDateTimeProvider, DateTimeProvider>();
         services.AddScoped<IOrderPriceService, OrderPriceService>();

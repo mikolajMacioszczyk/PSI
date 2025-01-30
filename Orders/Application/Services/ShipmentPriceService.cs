@@ -5,9 +5,9 @@ namespace Application.Services;
 
 public class ShipmentPriceService : IShipmentPriceService
 {
-    public async Task<decimal> GetShipmentPrice(Basket basket)
+    public Task<decimal> GetShipmentPrice(Basket basket)
     {
         // TODO
-        return 4;
+        return Task.FromResult(4m);
     }
 }
