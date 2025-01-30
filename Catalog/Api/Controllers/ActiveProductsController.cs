@@ -1,8 +1,8 @@
-﻿using Application.Models;
-using Application.Requests.Products;
+﻿using Application.Requests.Products;
 using Application.Requests.Products.GetActiveProductById;
 using Application.Requests.Products.GetAllProducts;
 using Common.Api.Controllers;
+using Common.Application.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
