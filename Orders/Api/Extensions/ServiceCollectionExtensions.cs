@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Requests.Orders.CreateOrder;
 using Application.Services;
 using Common.Application.Interfaces;
 using Common.Application.Services;
@@ -21,7 +22,7 @@ public static class ServiceCollectionExtensions
 
     public static void AddFluentValidators(this IServiceCollection services)
     {
-        //services.AddScoped<IValidator<>, >();
+        services.AddScoped<IValidator<CreateOrderCommand>, CreateOrderCommandValidator>();
     }
 
     public static void AddSwagger(this IServiceCollection services)

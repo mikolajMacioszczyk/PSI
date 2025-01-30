@@ -3,7 +3,6 @@ using MediatR;
 
 namespace Application.Requests.Orders.CreateOrder;
 
-// TODO: Validate: ConsentGranted
 public record CreateOrderCommand(
     Guid BasketId,
     bool ConsentGranted,
