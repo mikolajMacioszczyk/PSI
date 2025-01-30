@@ -1,110 +1,112 @@
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
-from pydantic import BaseModel
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy.orm import Session
+from jose import jwt
+import crud, models, schemas, dependencies, database
+from database import engine
+from database import SessionLocal
 
-app = FastAPI()
+app = FastAPI(
+    title="Warehouse API",
+    description="API do zarządzania magazynem i powiadomieniami",
+    version="1.0",
+    docs_url="/docs",
+    redoc_url="/redoc"
+)
 
-# In-memory storage for inventory items
-inventory = {
-    "item1": {"name": "Widget", "quantity": 10, "threshold": 5},
-    "item2": {"name": "Gadget", "quantity": 20, "threshold": 10},
-}
+models.Base.metadata.create_all(bind=engine)
 
+# OAuth2
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-class UpdateInventoryRequest(BaseModel):
-    item_id: str
-    quantity: int
-
-
-# WebSocket connection manager
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: list[WebSocket] = []
-
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections.append(websocket)
-
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
-
-    async def send_message(self, message: str):
-        for connection in self.active_connections:
-            await connection.send_text(message)
+# Zbiór aktywnych połączeń WebSocket
+active_connections = set()
 
 
-manager = ConnectionManager()
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# Funkcja do weryfikacji tokenu JWT i wyciągania roli
+def get_role_from_token(token: str):
+    try:
+        # Klucz sekretu używany do podpisania tokenu
+        secret_key = "SECRET_KEY"  # Zastąp tym, który masz w swoim systemie
+        payload = jwt.decode(token, secret_key, algorithms=["HS256"])
+        return payload.get("role")
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+async def notify_low_stock(product_id: int, db: Session):
+    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    notification = db.query(models.Notification).filter(models.Notification.product_id == product_id).first()
+
+    if product and notification and product.stock < notification.minimum_stock:
+        message = {
+            "type": "low_stock",
+            "product_id": product.id,
+            "product_name": product.name,
+            "message": notification.message
+        }
+
+        # Wysyłanie powiadomienia do wszystkich połączonych WebSocketów
+        for connection in active_connections:
+            await connection.send_json(message)
 
 
-async def send_notification(item_id: str, item_name: str, quantity: int):
-    """
-    Send notifications about low stock using WebSocket.
-    """
-    message = f"ALERT: Low stock for {item_name} ({item_id}). Remaining: {quantity} units."
-    await manager.send_message(message)
+@app.put("/product/{product_id}", response_model=schemas.Product)
+async def update_product_stock(
+        product_id: int, product_update: schemas.ProductUpdate, db: Session = Depends(get_db),
+        token: str = Depends(oauth2_scheme)
+):
+    role = dependencies.get_user_role(db, token)
+    if role != "warehouse_worker":
+        raise HTTPException(status_code=403, detail="Permission denied")
+
+    # Aktualizacja stanu magazynowego
+    product = crud.update_product_stock(db, product_id, product_update)
+    await notify_low_stock(product_id, db)
+    return product
 
 
-@app.get("/inventory")
-def get_inventory():
-    """Retrieve the current inventory status."""
-    return inventory
-
-
-@app.put("/inventory/update")
-async def update_inventory(request: UpdateInventoryRequest):
-    """
-    Update the quantity of a specific item.
-    If the quantity falls below the threshold, trigger a notification.
-    """
-    if request.item_id not in inventory:
-        raise HTTPException(status_code=404, detail="Item not found")
-
-    # Update the inventory
-    inventory[request.item_id]["quantity"] = request.quantity
-
-    # Check for low stock and send notification
-    if request.quantity <= inventory[request.item_id]["threshold"]:
-        await send_notification(
-            request.item_id,
-            inventory[request.item_id]["name"],
-            request.quantity,
-        )
-
-    return {"message": f"Updated {request.item_id} to quantity {request.quantity}"}
-
-
-@app.get("/inventory/low-stock")
-def check_low_stock():
-    """
-    Retrieve a list of items with low stock (below or equal to the threshold).
-    """
-    low_stock_items = {
-        item_id: item for item_id, item in inventory.items()
-        if item["quantity"] <= item["threshold"]
-    }
-    return low_stock_items
-
-
-@app.post("/inventory/notify-low-stock")
-async def notify_low_stock():
-    """
-    Check for items with low stock and send notifications for each.
-    """
-    low_stock_items = check_low_stock()
-    for item_id, item in low_stock_items.items():
-        await send_notification(item_id, item["name"], item["quantity"])
-
-    return {"message": "Notifications sent for low-stock items"}
+@app.post("/notification/", response_model=schemas.NotificationCreate)
+async def create_notification(notification: schemas.NotificationCreate, db: Session = Depends(get_db),
+                              token: str = Depends(oauth2_scheme)):
+    role = dependencies.get_user_role(db, token)
+    if role != "admin":
+        raise HTTPException(status_code=403, detail="Permission denied")
+    return crud.create_notification(db, notification)
 
 
 @app.websocket("/ws/notifications")
-async def websocket_endpoint(websocket: WebSocket):
-    """
-    WebSocket endpoint to send real-time notifications.
-    """
-    await manager.connect(websocket)
+async def websocket_endpoint(websocket: WebSocket, token: str, db: Session = Depends(get_db)):
     try:
+        payload = jwt.decode(token, "SECRET_KEY", algorithms=["HS256"])
+        role = payload.get("role")
+
+        if role != "warehouse_worker":
+            await websocket.close()
+            return
+
+        # Akceptowanie połączenia WebSocket
+        await websocket.accept()
+        active_connections.add(websocket)
+
+        # Nasłuchiwanie połączenia do zakończenia
         while True:
-            # Keep the WebSocket connection alive
-            await websocket.receive_text()
-    except WebSocketDisconnect:
-        manager.disconnect(websocket)
+            try:
+                # Możemy tu dodać jakąkolwiek logikę w przypadku zapytań z WebSocket, np. odpowiedź na wiadomości
+                data = await websocket.receive_text()
+                print(f"Received data: {data}")
+            except WebSocketDisconnect:
+                active_connections.remove(websocket)
+                break
+
+    except Exception as e:
+        print(f"WebSocket error: {e}")
+        await websocket.close()
