@@ -3,7 +3,6 @@ using Common.Application.Interfaces;
 
 namespace Application.Services;
 
-// TODO: Tests
 public class OrderNumberService : IOrderNumberService
 {
     private readonly IDateTimeProvider _dateTimeProvider;

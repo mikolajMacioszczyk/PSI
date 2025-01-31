@@ -12,7 +12,7 @@ namespace Domain.Entities
         public Purchase? Purchase { get; set; }
 
         public Guid ShipmentId { get; set; }
-        public required Shipment Shipment { get; set; }
+        public Shipment Shipment { get; set; } = null!;
 
         public IEnumerable<OrderStatusChangedNotification> StatusChangedNotifications { get; set; } = [];
 
