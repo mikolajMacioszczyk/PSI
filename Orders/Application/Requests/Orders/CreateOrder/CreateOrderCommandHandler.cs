@@ -9,6 +9,7 @@ using MediatR;
 
 namespace Application.Requests.Orders.CreateOrder;
 
+// TODO: Tests
 public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Result<OrderResult>>
 {
     private readonly IUnitOfWork _unitOfWork;

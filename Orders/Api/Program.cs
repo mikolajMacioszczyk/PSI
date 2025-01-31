@@ -69,6 +69,11 @@ builder.Services.AddHttpClient<IBasketService, HttpBasketService>(client =>
     client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("BasketAndWishlist")!);
 });
 
+builder.Services.AddHttpClient<ICatalogService, HttpCatalogService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("Catalog")!);
+});
+
 // tokena validation
 builder.Services.AddKeycloakJwtAuthentication(builder, builder.Environment, withIntrospection: true);
 
