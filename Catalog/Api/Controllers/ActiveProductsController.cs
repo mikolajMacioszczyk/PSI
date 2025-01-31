@@ -1,5 +1,6 @@
 ﻿using Application.Requests.Products;
 using Application.Requests.Products.GetActiveProductById;
+using Application.Requests.Products.GetActiveProductsByIds;
 using Application.Requests.Products.GetAllProducts;
 using Common.Api.Controllers;
 using Common.Application.Models;
@@ -18,6 +19,10 @@ namespace Api.Controllers
         [HttpGet()]
         public async Task<ActionResult<PagedResultBase<CatalogProductResult>>> GetActiveProducts([FromQuery] GetActiveProductsQuery query) =>
             Ok(await _mediator.Send(query));
+
+        [HttpGet("search")]
+        public Task<ActionResult<IEnumerable<CatalogProductResult>>> GetActiveProductsByIds([FromQuery] GetActiveProductsByIdsQuery query) =>
+            HandleRequest(query);
 
         [HttpGet("{Id}")]
         public Task<ActionResult<CatalogProductResult>> GetActiveProductById([FromRoute] GetActiveProductByIdQuery query)

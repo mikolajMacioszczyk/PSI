@@ -34,4 +34,9 @@ public class CatalogProductRepository : ICatalogProductRepository
     {
         return await _context.CatalogProducts.FirstOrDefaultAsync(p => p.Id == id);
     }
+
+    public async Task<IEnumerable<CatalogProduct>> GetByIds(IEnumerable<Guid> ids)
+    {
+        return await _context.CatalogProducts.Where(p => ids.Contains(p.Id)).ToListAsync();
+    }
 }

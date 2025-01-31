@@ -1,13 +1,20 @@
 ﻿using Application.Interfaces;
 using Application.Models;
+using Common.Application.Services;
 
 namespace Application.Services;
 
-public class HttpCatalogService : ICatalogService
+public class HttpCatalogService : HttpServiceBase, ICatalogService
 {
-    // TODO
-    public Task<IEnumerable<CatalogProduct>> GetCatalogProductsByIds(IEnumerable<Guid> ids)
+    public HttpCatalogService(HttpClient httpClient) : base(httpClient)
+    {}
+
+    public async Task<IEnumerable<CatalogProduct>> GetCatalogProductsByIds(IEnumerable<Guid> ids)
     {
-        throw new NotImplementedException();
+        if (ids.Any())
+        {
+            return (await Get<IEnumerable<CatalogProduct>>($"ActiveProducts/search?Ids={string.Join("&Ids=", ids)}"))!;
+        }
+        return [];
     }
 }
