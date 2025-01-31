@@ -44,6 +44,30 @@ public class SubstractProductFromBasketCommandHandlerTests
     }
 
     [Fact]
+    public async Task InactiveBasket_ReturnsNotFound()
+    {
+        // Arrange
+        var basketId = Guid.NewGuid();
+        var productInCatalogId = Guid.NewGuid();
+        var command = new SubstractProductFromBasketCommand(basketId, productInCatalogId);
+        var expectedErrorMesage = $"Basket with provided id {basketId} is not active";
+
+        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = [], IsActive = false };
+
+        _basketRepositoryMock.Setup(m => m.GetByIdWithProducts(basketId))
+            .ReturnsAsync(basketFromRepo)
+            .Verifiable();
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(expectedErrorMesage, result.ErrorMessage);
+        _basketRepositoryMock.Verify();
+    }
+
+    [Fact]
     public async Task ProductNotExistsInBasket_ShouldReturnFailure()
     {
         // Arrange
@@ -52,7 +76,7 @@ public class SubstractProductFromBasketCommandHandlerTests
         var command = new SubstractProductFromBasketCommand(basketId, productInCatalogId);
         var expectedErrorMesage = $"Product with provided id {productInCatalogId} is not part of the busket";
 
-        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = [] };
+        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = [], IsActive = true };
 
         _basketRepositoryMock.Setup(m => m.GetByIdWithProducts(basketId))
             .ReturnsAsync(basketFromRepo)
@@ -78,7 +102,7 @@ public class SubstractProductFromBasketCommandHandlerTests
         var productInCatalogId = Guid.NewGuid();
         var command = new SubstractProductFromBasketCommand(basketId, productInCatalogId);
 
-        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = [] };
+        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = [], IsActive = true };
 
         var existingProduct = new ProductInBasket
         {
@@ -113,7 +137,7 @@ public class SubstractProductFromBasketCommandHandlerTests
         var productInCatalogId = Guid.NewGuid();
         var command = new SubstractProductFromBasketCommand(basketId, productInCatalogId);
 
-        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = [] };
+        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = [], IsActive = true };
 
         var existingProduct = new ProductInBasket
         {

@@ -22,12 +22,12 @@ public class CreateOrGetBasketCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_UserHasExistingBasket_ReturnsMappedBasket()
+    public async Task Handle_UserHasExistingActiveBasket_ReturnsMappedBasket()
     {
         // Arrange
         var userId = Guid.NewGuid();
         var command = new CreateOrGetBasketCommand();
-        var existingBasket = new Basket { Id = Guid.NewGuid(), UserId = userId, ProductsInBaskets = [] };
+        var existingBasket = new Basket { Id = Guid.NewGuid(), UserId = userId, ProductsInBaskets = [], IsActive = true };
         var expectedBasketResult = new BasketResult();
 
         _basketRepositoryMock.Setup(m => m.GetByUserIdWithProducts(userId))
@@ -81,6 +81,43 @@ public class CreateOrGetBasketCommandHandlerTests
         Assert.Empty(createdBasket.ProductsInBaskets);
         Assert.Equal(expectedBasketResult, result);
 
+        _basketRepositoryMock.Verify(m => m.CreateAsync(It.IsAny<Basket>()), Times.Once);
+        _unitOfWorkMock.Verify(m => m.SaveChangesAsync(), Times.Once);
+        _identityServiceMock.Verify();
+    }
+
+    [Fact]
+    public async Task Handle_UserHasExistingInActiveBasket_CreatesNewBasket()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var command = new CreateOrGetBasketCommand();
+        var existingBasket = new Basket { Id = Guid.NewGuid(), UserId = userId, ProductsInBaskets = [], IsActive = false };
+        Basket? createdBasket = null;
+        var expectedBasketResult = new BasketResult();
+
+        _basketRepositoryMock.Setup(m => m.GetByUserIdWithProducts(userId))
+            .ReturnsAsync(existingBasket);
+
+        _basketRepositoryMock.Setup(m => m.CreateAsync(It.IsAny<Basket>()))
+            .Callback<Basket>(b => createdBasket = b)!.ReturnsAsync(createdBasket);
+
+        _identityServiceMock.Setup(m => m.TryGetUserId())
+            .Returns(userId)
+            .Verifiable();
+
+        _unitOfWorkMock.Setup(m => m.SaveChangesAsync());
+
+        _mapperMock.Setup(m => m.Map<BasketResult>(It.IsAny<Basket>())).Returns(expectedBasketResult);
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        Assert.NotNull(createdBasket);
+        Assert.Equal(userId, createdBasket.UserId);
+        Assert.Empty(createdBasket.ProductsInBaskets);
+        Assert.Equal(expectedBasketResult, result);
         _basketRepositoryMock.Verify(m => m.CreateAsync(It.IsAny<Basket>()), Times.Once);
         _unitOfWorkMock.Verify(m => m.SaveChangesAsync(), Times.Once);
         _identityServiceMock.Verify();

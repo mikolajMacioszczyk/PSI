@@ -25,6 +25,11 @@ public class SubstractProductFromBasketCommandHandler : IRequestHandler<Substrac
             return new NotFound(request.BasketId, $"Basket with provided id {request.BasketId} does not exists");
         }
 
+        if (!basket.IsActive)
+        {
+            return new Failure($"Basket with provided id {request.BasketId} is not active");
+        }
+
         var existingProductEntry = basket.ProductsInBaskets.FirstOrDefault(p => p.ProductInCatalogId == request.ProductInCatalogId);
         if (existingProductEntry is null)
         {

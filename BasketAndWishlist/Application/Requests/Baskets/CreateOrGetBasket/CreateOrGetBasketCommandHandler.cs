@@ -31,7 +31,7 @@ public class CreateOrGetBasketCommandHandler : IRequestHandler<CreateOrGetBasket
         if (userId.HasValue)
         {
             var existingBasket = await _unitOfWork.BasketRepository.GetByUserIdWithProducts(userId.Value);
-            if (existingBasket is not null)
+            if (existingBasket is not null && existingBasket.IsActive)
             {
                 return existingBasket;
             }

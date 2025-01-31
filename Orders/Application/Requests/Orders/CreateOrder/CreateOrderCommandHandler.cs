@@ -70,7 +70,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
 
         await _unitOfWork.SaveChangesAsync();
 
-        // TODO: Cleanup basket
+        // TODO: Set basket inactive
         return _mapper.Map<OrderResult>(order);
     }
 
