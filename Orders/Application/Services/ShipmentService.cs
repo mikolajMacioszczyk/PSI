@@ -3,11 +3,16 @@ using Application.Models;
 
 namespace Application.Services;
 
-public class ShipmentPriceService : IShipmentPriceService
+// TODO
+public class ShipmentService : IShipmentService
 {
+    public bool ValidateShipmentProviderExists(Guid providerId)
+    {
+        return true;
+    }
+
     public Task<decimal> GetShipmentPrice(Basket basket)
     {
-        // TODO
         return Task.FromResult(4m);
     }
 }

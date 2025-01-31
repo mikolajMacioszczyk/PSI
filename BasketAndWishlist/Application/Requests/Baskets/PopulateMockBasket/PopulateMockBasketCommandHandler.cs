@@ -32,7 +32,8 @@ public class PopulateMockBasketCommandHandler : IRequestHandler<PopulateMockBask
         {
             Id = Guid.NewGuid(),
             UserId = _identityService.UserId,
-            ProductsInBaskets = []
+            ProductsInBaskets = [],
+            IsActive = true,
         };
 
         var allActiveCatalogProducts = await _catalogProductsService.GetActiveCatalogProducts(pageSize: 100, pageNumber: 1);

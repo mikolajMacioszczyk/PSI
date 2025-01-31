@@ -25,7 +25,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDateTimeProvider, DateTimeProvider>();
         services.AddScoped<IOrderPriceService, OrderPriceService>();
         services.AddScoped<IOrderNumberService, OrderNumberService>();
-        services.AddScoped<IShipmentPriceService, ShipmentPriceService>();
+        services.AddScoped<IShipmentService, ShipmentService>();
     }
 
     public static void AddFluentValidators(this IServiceCollection services)

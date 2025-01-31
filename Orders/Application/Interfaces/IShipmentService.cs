@@ -2,7 +2,8 @@
 
 namespace Application.Interfaces;
 
-public interface IShipmentPriceService
+public interface IShipmentService
 {
+    bool ValidateShipmentProviderExists(Guid providerId);
     Task<decimal> GetShipmentPrice(Basket basket);
 }

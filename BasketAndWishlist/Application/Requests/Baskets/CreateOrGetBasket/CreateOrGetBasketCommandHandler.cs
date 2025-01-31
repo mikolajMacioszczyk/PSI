@@ -41,7 +41,8 @@ public class CreateOrGetBasketCommandHandler : IRequestHandler<CreateOrGetBasket
         {
             Id = Guid.NewGuid(),
             UserId = userId,
-            ProductsInBaskets = []
+            ProductsInBaskets = [],
+            IsActive = true,
         };
         await _unitOfWork.BasketRepository.CreateAsync(createdBasked);
         await _unitOfWork.SaveChangesAsync();

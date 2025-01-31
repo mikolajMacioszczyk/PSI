@@ -117,6 +117,7 @@ public class CreateOrGetBasketCommandHandlerTests
         Assert.NotNull(createdBasket);
         Assert.Equal(userId, createdBasket.UserId);
         Assert.Empty(createdBasket.ProductsInBaskets);
+        Assert.True(createdBasket.IsActive);
         Assert.Equal(expectedBasketResult, result);
         _basketRepositoryMock.Verify(m => m.CreateAsync(It.IsAny<Basket>()), Times.Once);
         _unitOfWorkMock.Verify(m => m.SaveChangesAsync(), Times.Once);
@@ -149,6 +150,7 @@ public class CreateOrGetBasketCommandHandlerTests
         Assert.NotNull(createdBasket);
         Assert.Null(createdBasket.UserId);
         Assert.Empty(createdBasket.ProductsInBaskets);
+        Assert.True(createdBasket.IsActive);
         Assert.Equal(expectedBasketResult, result);
 
         _basketRepositoryMock.Verify(m => m.CreateAsync(It.IsAny<Basket>()), Times.Once);

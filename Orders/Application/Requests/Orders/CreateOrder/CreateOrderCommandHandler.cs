@@ -16,7 +16,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IOrderPriceService _orderPriceService;
     private readonly IOrderNumberService _orderNumberService;
-    private readonly IShipmentPriceService _shipmentPriceService;
+    private readonly IShipmentService _shipmentService;
     private readonly IMapper _mapper;
 
     public CreateOrderCommandHandler(
@@ -25,7 +25,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
         IDateTimeProvider dateTimeProvider,
         IOrderPriceService orderPriceService,
         IOrderNumberService orderNumberService,
-        IShipmentPriceService shipmentPriceService,
+        IShipmentService shipmentService,
         IMapper mapper)
     {
         _unitOfWork = unitOfWork;
@@ -33,7 +33,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
         _dateTimeProvider = dateTimeProvider;
         _orderPriceService = orderPriceService;
         _orderNumberService = orderNumberService;
-        _shipmentPriceService = shipmentPriceService;
+        _shipmentService = shipmentService;
         _mapper = mapper;
     }
 
@@ -46,11 +46,14 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
             return new Failure($"Basket with provided id {request.BasketId} not exists");
         }
 
-        // TODO: Validate shipment provider
+        if (!_shipmentService.ValidateShipmentProviderExists(request.ShipmentProviderId))
+        {
+            return new Failure($"Shipment provider with provided id {request.ShipmentProviderId} not exists");
+        }
 
         var shipment = _mapper.Map<Shipment>(request);
         shipment.Id = Guid.NewGuid();
-        shipment.ShipmentPrice = await _shipmentPriceService.GetShipmentPrice(basket);
+        shipment.ShipmentPrice = await _shipmentService.GetShipmentPrice(basket);
 
         var order = new Order
         {
