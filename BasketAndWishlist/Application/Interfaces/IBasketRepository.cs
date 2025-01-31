@@ -5,7 +5,9 @@ namespace Application.Interfaces
     public interface IBasketRepository
     {
         Task<Basket> CreateAsync(Basket basket);
+        Task<Basket?> GetById(Guid id);
         Task<Basket?> GetByIdWithProducts(Guid id);
-        Task<Basket?> GetByUserIdWithProducts(Guid userId);
+        Task<Basket?> GetActiveByUserIdWithProducts(Guid userId);
+        void Update(Basket basket);
     }
 }

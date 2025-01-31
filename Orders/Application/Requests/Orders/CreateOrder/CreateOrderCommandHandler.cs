@@ -46,6 +46,11 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
             return new Failure($"Basket with provided id {request.BasketId} not exists");
         }
 
+        if (!basket.IsActive)
+        {
+            return new Failure($"Basket with provided id {request.BasketId} is not active");
+        }
+
         if (!_shipmentService.ValidateShipmentProviderExists(request.ShipmentProviderId))
         {
             return new Failure($"Shipment provider with provided id {request.ShipmentProviderId} not exists");
@@ -73,7 +78,8 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
 
         await _unitOfWork.SaveChangesAsync();
 
-        // TODO: Set basket inactive
+        await _basketService.SetBasketInactive(request.BasketId);
+
         return _mapper.Map<OrderResult>(order);
     }
 

@@ -41,28 +41,6 @@ public class GetBasketByIdQueryHandlerTests
     }
 
     [Fact]
-    public async Task InactiveBasket_ReturnsNotFound()
-    {
-        // Arrange
-        var basketId = Guid.NewGuid();
-        var command = new GetBasketByIdQuery(basketId);
-        var expectedErrorMesage = $"Basket with provided id {basketId} is not active";
-
-        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = [], IsActive = false };
-        _basketRepositoryMock.Setup(m => m.GetByIdWithProducts(basketId))
-            .ReturnsAsync(basketFromRepo)
-            .Verifiable();
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        Assert.True(result.IsNotFound);
-        Assert.Equal(expectedErrorMesage, result.ErrorMessage);
-        _basketRepositoryMock.Verify();
-    }
-
-    [Fact]
     public async Task BasketFound_ReturnsSuccess()
     {
         // Arrange

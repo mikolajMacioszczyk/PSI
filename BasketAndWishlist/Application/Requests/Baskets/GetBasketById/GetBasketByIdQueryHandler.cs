@@ -25,11 +25,6 @@ public class GetBasketByIdQueryHandler : IRequestHandler<GetBasketByIdQuery, Res
             return new NotFound(request.Id, $"Basket with provided id {request.Id} does not exists");
         }
 
-        if (!basket.IsActive)
-        {
-            return new NotFound(request.Id, $"Basket with provided id {request.Id} is not active");
-        }
-
         return _mapper.Map<BasketResult>(basket);
     }
 }
