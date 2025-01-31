@@ -21,6 +21,7 @@ namespace Persistence
                     {
                         Id = Guid.NewGuid(),
                         ProductId = Guid.Parse($"00000000-0000-0000-0000-{i.ToString().PadLeft(12, '0')}"),
+                        Name = faker.Commerce.ProductName(),
                         SKU = faker.Commerce.Ean13(),
                         Price = Convert.ToDecimal(faker.Commerce.Price()),
                         Description = faker.Commerce.ProductDescription(),

@@ -153,6 +153,7 @@ public class AddProductToBasketCommandHandlerTests
             Id = productInCatalogId,
             ProductId = Guid.NewGuid(),
             Price = 10,
+            Name = "product name",
             PhotoUrl = "photo url",
             SKU = "sku",
             Description = "catalog product description"
