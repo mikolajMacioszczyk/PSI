@@ -1,5 +1,6 @@
 ﻿using Application.Requests.Purchases;
 using Application.Requests.Purchases.CreateCheckoutSession;
+using Application.Requests.Purchases.CreatePurchaseWithCash;
 using Application.Requests.Purchases.GetPurchaseById;
 using Common.Api.Controllers;
 using MediatR;
@@ -23,7 +24,8 @@ public class PurchaseController : BaseApiController
     public Task<ActionResult<CreateCheckoutSessionCommandResult>> CreateCheckoutSession([FromBody] CreateCheckoutSessionCommand command) =>
             HandleRequest(command);
 
-    // TODO: Other purchase for cash
-
-    // TODO: Activate order
+    [AllowAnonymous]
+    [HttpPost("cash")]
+    public Task<ActionResult<PurchaseResult>> CreatePurchaseWithCash([FromBody] CreatePurchaseWithCashCommand command) =>
+            HandleRequest(command);
 }
