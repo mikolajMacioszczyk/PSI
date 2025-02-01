@@ -18,9 +18,10 @@ app = FastAPI(
 # Define HTTPBearer for Bearer token authentication
 security = HTTPBearer()
 
+#Inicjalizacja Bazy danych przy starcie aplikacji
+init_db()
 # Zbiór aktywnych połączeń WebSocket
 active_connections = set()
-
 
 def get_role_from_token(authorization: HTTPAuthorizationCredentials):
     token = authorization.credentials  # Wyciąganie tokena z nagłówka autoryzacji
@@ -198,5 +199,4 @@ async def websocket_endpoint(
 
 if __name__ == "__main__":
     import uvicorn
-    init_db()
     uvicorn.run(app, host="127.0.0.1", port=5000)
