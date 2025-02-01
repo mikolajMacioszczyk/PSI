@@ -4,13 +4,13 @@ from src.entrypoints.http.notification_routes import router as notification_rout
 from src.common import active_connections
 from fastapi import WebSocket, WebSocketDisconnect
 import jwt
-
+from src.repositories.relational_db import init_db
 app = FastAPI(
     title="Warehouse API",
     description="API do zarządzania magazynem i powiadomieniami",
     version="1.0"
 )
-
+init_db()
 app.include_router(product_router, prefix="/api")
 app.include_router(notification_router, prefix="/api")
 

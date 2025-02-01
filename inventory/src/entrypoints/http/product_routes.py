@@ -17,7 +17,7 @@ async def get_products(
     token: HTTPAuthorizationCredentials = Depends(security)
 ):
     role = get_role_from_token(token)
-    if "WarehouseEmployee" not in role:
+    if "WarehouseEmployee" not in role and "Admin" not in role:
         raise HTTPException(status_code=403, detail="Permission denied")
 
     products = get_products_by_skus(db, skus)
@@ -47,4 +47,18 @@ async def update_product_stock(
 
     await notify_low_stock(product_sku, db)  # Pass sku instead of product_id
 
+    return product
+
+@router.get("/product/{product_sku}", response_model=ProductSchema)
+async def get_product(
+        product_sku: str, db: Session = Depends(get_db),
+        token: HTTPAuthorizationCredentials = Depends(security)
+):
+    role = get_role_from_token(token)
+    if "WarehouseEmployee" not in role and "Admin" not in role:
+        raise HTTPException(status_code=403, detail="Permission denied")
+
+    product = get_product_by_sku(db, product_sku)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
     return product
