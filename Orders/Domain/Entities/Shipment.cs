@@ -3,7 +3,7 @@
     public class Shipment
     {
         public Guid Id { get; set; }
-        public required Order Order { get; set; }
+        public Order Order { get; set; } = null!;
         public Guid ProviderId { get; set; }
         public Guid? PackageId { get; set; }
 

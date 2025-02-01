@@ -1,6 +1,8 @@
 using Api.Extensions;
 using Application.Interfaces;
+using Application.Services;
 using FluentValidation.AspNetCore;
+using Infrastructure.AuthenticationAdapters;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using System.Reflection;
@@ -60,6 +62,20 @@ builder.Services.AddCors(options =>
             .SetIsOriginAllowed(origin => true);
     });
 });
+
+// httpClients
+builder.Services.AddHttpClient<IBasketService, HttpBasketService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("BasketAndWishlist")!);
+});
+
+builder.Services.AddHttpClient<ICatalogService, HttpCatalogService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("Catalog")!);
+});
+
+// tokena validation
+builder.Services.AddKeycloakJwtAuthentication(builder, builder.Environment, withIntrospection: true);
 
 var app = builder.Build();
 

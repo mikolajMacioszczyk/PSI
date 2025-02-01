@@ -1,4 +1,9 @@
 ﻿using Application.Interfaces;
+using Application.Requests.Orders.CreateOrder;
+using Application.Services;
+using Common.Application.Interfaces;
+using Common.Application.Services;
+using Common.Infrastructure.AuthenticationAdapters;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
@@ -12,11 +17,20 @@ public static class ServiceCollectionExtensions
     public static void AddApplicationDependencies(this IServiceCollection services)
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        services.AddHttpContextAccessor();
+        services.AddScoped<IIdentityService, KeycloakIdentityService>();
+        
+        services.AddScoped<IBasketService, HttpBasketService>();
+        services.AddScoped<IDateTimeProvider, DateTimeProvider>();
+        services.AddScoped<IOrderPriceService, OrderPriceService>();
+        services.AddScoped<IOrderNumberService, OrderNumberService>();
+        services.AddScoped<IShipmentService, ShipmentService>();
     }
 
     public static void AddFluentValidators(this IServiceCollection services)
     {
-        //services.AddScoped<IValidator<>, >();
+        services.AddScoped<IValidator<CreateOrderCommand>, CreateOrderCommandValidator>();
     }
 
     public static void AddSwagger(this IServiceCollection services)

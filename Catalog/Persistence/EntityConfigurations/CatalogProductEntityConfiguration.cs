@@ -8,7 +8,9 @@ namespace Persistence.EntityConfigurations
     {
         public void Configure(EntityTypeBuilder<CatalogProduct> builder)
         {
+            builder.ToTable("CatalogProduct");
             builder.Property(c => c.SKU).HasMaxLength(64);
+            builder.Property(c => c.Name).HasMaxLength(128);
             builder.Property(c => c.PhotoUrl).HasMaxLength(1024);
             builder.Property(c => c.Description).HasMaxLength(32768);
         }
