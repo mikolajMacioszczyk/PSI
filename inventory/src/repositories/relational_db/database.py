@@ -1,27 +1,16 @@
-import pg8000
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import sessionmaker
 import random
 from faker import Faker
 from sqlalchemy.orm import Session
-from models import Warehouse, Product, Notification
-
-# Initialize SQLAlchemy engine with the pg8000 driver
-engine = create_engine(
-    "postgresql+pg8000://postgres:221001@localhost:5432/warehouse"
-)
+from src.models import Notification, Warehouse, Product
+from src.common import engine
+from src.common import Base
 
 # Create a session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Declare the base class for models
-Base = declarative_base()
-
-# Create the tables in the database if they don't exist
 Base.metadata.create_all(bind=engine)
-
 # Function to get a database session
-def initDB():
+def init_db():
     db = SessionLocal()
     try:
         generate_initial_data(db)
@@ -84,7 +73,7 @@ def generate_initial_data(db: Session):
         # Create low stock notifications for products
         low_stock_notifications = [
             Notification(
-                product_id=product.sku,  # Odwołanie do sku zamiast id
+                product_id=product.sku,
                 message=f"Low stock alert for product {product.sku}",
                 minimum_stock=20,  # Example minimum stock level
             )

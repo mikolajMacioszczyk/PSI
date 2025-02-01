@@ -1,17 +1,13 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, HTTPException, status, Query
-from fastapi.security import HTTPBearer, OAuth2PasswordBearer
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, HTTPException
+from fastapi.security import HTTPBearer
 from sqlalchemy.orm import Session
 import jwt
-# import crud, models, schemas, dependencies, database
-import models, schemas
-from models import SKURequest
-from database import engine
-from database import SessionLocal
-from database import get_db
-from database import initDB
+import re
 from fastapi.security import HTTPAuthorizationCredentials
 from typing import List
-
+from src.models import Product, Warehouse, Notification, ProductCreate
+from src.models import ProductUpdate, NotificationCreate, ProductSchema, SKURequest
+from src.repositories.relational_db import get_db, init_db
 app = FastAPI(
     title="Warehouse API",
     description="API do zarządzania magazynem i powiadomieniami",
@@ -19,9 +15,6 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc"
 )
-
-models.Base.metadata.create_all(bind=engine)
-
 # Define HTTPBearer for Bearer token authentication
 security = HTTPBearer()
 
@@ -51,14 +44,14 @@ def get_role_from_token(authorization: HTTPAuthorizationCredentials):
 
 async def notify_low_stock(product_sku: str, db: Session):
     # Retrieve the product using SKU instead of id
-    product = db.query(models.Product).filter(models.Product.sku == product_sku).first()
+    product = db.query(Product).filter(Product.sku == product_sku).first()
 
     # Check if product is found
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
     # Retrieve the notification using product.id (product_id in Notification)
-    notification = db.query(models.Notification).filter(models.Notification.product_id == product_sku).first()
+    notification = db.query(Notification).filter(Notification.product_id == product_sku).first()
 
     # If the product and notification exist and the stock is low
     if product and notification and product.stock < notification.minimum_stock:
@@ -73,9 +66,9 @@ async def notify_low_stock(product_sku: str, db: Session):
             await connection.send_json(message)
 
 
-@app.put("/product/{product_sku}", response_model=schemas.Product)
+@app.put("/product/{product_sku}", response_model=ProductCreate)
 async def update_product_stock(
-        product_sku: str, product_update: schemas.ProductUpdate, db: Session = Depends(get_db),
+        product_sku: str, product_update: ProductUpdate, db: Session = Depends(get_db),
         token: HTTPAuthorizationCredentials = Depends(security)
 ):
     # Extract role from the Bearer token
@@ -84,7 +77,7 @@ async def update_product_stock(
         raise HTTPException(status_code=403, detail="Permission denied")
 
     # Retrieve the current product using SKU instead of id
-    product = db.query(models.Product).filter(models.Product.sku == product_sku).first()  # Use sku instead of id
+    product = db.query(Product).filter(Product.sku == product_sku).first()  # Use sku instead of id
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
@@ -102,7 +95,7 @@ async def update_product_stock(
     return product
 
 
-@app.post("/products/batch", response_model=List[schemas.Product])
+@app.post("/products/batch", response_model=List[ProductSchema])
 async def get_products_by_skus(
         sku_request: SKURequest,
         db: Session = Depends(get_db),
@@ -114,15 +107,15 @@ async def get_products_by_skus(
         raise HTTPException(status_code=403, detail="Permission denied")
 
     # Pobranie produktów na podstawie listy SKU
-    products = db.query(models.Product).filter(models.Product.sku.in_(sku_request.skus)).all()
+    products = db.query(Product).filter(Product.sku.in_(sku_request.skus)).all()
 
     if not products:
         raise HTTPException(status_code=404, detail="No products found")
 
     return products
 
-@app.post("/notification/", response_model=schemas.NotificationCreate)
-async def create_notification(notification: schemas.NotificationCreate, db: Session = Depends(get_db),
+@app.post("/notification/", response_model=NotificationCreate)
+async def create_notification(notification: NotificationCreate, db: Session = Depends(get_db),
                               token: HTTPAuthorizationCredentials = Depends(security)  ):
     # Extract role from the Bearer token
     role = get_role_from_token(token)
@@ -131,8 +124,8 @@ async def create_notification(notification: schemas.NotificationCreate, db: Sess
         raise HTTPException(status_code=403, detail="Permission denied")
 
     # Check if the notification for the product already exists
-    existing_notification = db.query(models.Notification).filter(
-        models.Notification.product_id == notification.product_id).first()
+    existing_notification = db.query(Notification).filter(
+        Notification.product_id == notification.product_id).first()
 
     if existing_notification:
         # Update the existing notification
@@ -143,7 +136,7 @@ async def create_notification(notification: schemas.NotificationCreate, db: Sess
         return existing_notification
     else:
         # Create a new notification
-        new_notification = models.Notification(
+        new_notification = Notification(
             product_id=notification.product_id,  # This assumes product_id is still the correct field in Notification
             message=notification.message,
             minimum_stock=notification.minimum_stock
@@ -205,5 +198,5 @@ async def websocket_endpoint(
 
 if __name__ == "__main__":
     import uvicorn
-    initDB()
+    init_db()
     uvicorn.run(app, host="127.0.0.1", port=5000)
