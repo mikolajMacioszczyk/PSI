@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     
   orders:
     build: 
@@ -44,3 +44,19 @@ services:
       - postgres
     ports:
       - "8083:8080"
+
+  inventory:
+    build:
+      context: ./inventory  
+      dockerfile: Dockerfile  
+    environment:
+      - DB_USER=postgres
+      - DB_PASSWORD=221001
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=warehouse
+    depends_on:
+      - postgres
+    ports:
+      - "8084:5000" 
+   

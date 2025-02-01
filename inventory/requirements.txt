@@ -1,5 +1,7 @@
+fastapi~=0.115.8
+uvicorn~=0.34.0
 SQLAlchemy~=2.0.37
 pydantic~=2.10.6
-uvicorn~=0.34.0
-fastapi~=0.115.8
+psycopg2-binary
+PyJWT
 Faker~=35.2.0
