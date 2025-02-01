@@ -34,8 +34,7 @@ public class CreateCheckoutSessionCommandHandler : IRequestHandler<CreateCheckou
         var checkoutSessionUrl = await _paymentService.CreateOneTimeCheckoutSessionAsync(
             GetProductName(order),
             order.OrderPrice + order.Shipment.ShipmentPrice,
-            // TODO: Payment method
-            "card",
+            request.PaymentMethod,
             request.SuccessUrl,
             request.CancelUrl
             );
