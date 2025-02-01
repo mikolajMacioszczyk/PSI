@@ -31,13 +31,26 @@ public class CreateCheckoutSessionCommandHandler : IRequestHandler<CreateCheckou
             return new Failure($"Cannot create checkout session for order with status {order.OrderStatus}");
         }
 
+        var purchaseAmount = order.OrderPrice + order.Shipment.ShipmentPrice;
+        var purchase = new Purchase
+        {
+            Id = Guid.NewGuid(),
+            Order = order,
+            PaymentMethod = request.PaymentMethod,
+            Amount = purchaseAmount,
+            PurchaseTimestamp = DateTime.UtcNow,
+        };
+
         var checkoutSessionUrl = await _paymentService.CreateOneTimeCheckoutSessionAsync(
             GetProductName(order),
-            order.OrderPrice + order.Shipment.ShipmentPrice,
+            purchaseAmount,
             request.PaymentMethod,
-            request.SuccessUrl,
-            request.CancelUrl
+            $"{request.SuccessUrl}/{purchase.Id}",
+            $"{request.CancelUrl}/{purchase.Id}"
             );
+
+        await _unitOfWork.PurchaseRepository.CreateAsync(purchase);
+        await _unitOfWork.SaveChangesAsync();
 
         return new CreateCheckoutSessionCommandResult
         {

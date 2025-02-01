@@ -15,9 +15,10 @@ public class PurchaseController : BaseApiController
 
     [AllowAnonymous]
     [HttpPost("session")]
-    // TODO: Create puchase
     public Task<ActionResult<CreateCheckoutSessionCommandResult>> CreateCheckoutSession([FromBody] CreateCheckoutSessionCommand command) =>
             HandleRequest(command);
 
     // TODO: Other purchase for cash
+
+    // TODO: Activate order
 }
