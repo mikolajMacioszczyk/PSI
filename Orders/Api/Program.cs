@@ -3,8 +3,10 @@ using Application.Interfaces;
 using Application.Services;
 using FluentValidation.AspNetCore;
 using Infrastructure.AuthenticationAdapters;
+using Infrastructure.PaymentsAdapter;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
+using Stripe;
 using System.Reflection;
 using System.Text.Json.Serialization;
 
@@ -76,6 +78,10 @@ builder.Services.AddHttpClient<ICatalogService, HttpCatalogService>(client =>
 
 // tokena validation
 builder.Services.AddKeycloakJwtAuthentication(builder, builder.Environment, withIntrospection: true);
+
+// stripe
+StripeConfiguration.ApiKey = builder.Configuration.GetValue<string>("StripeSecretKey");
+builder.Services.AddScoped<IPaymentService, StripePaymentService>();
 
 var app = builder.Build();
 
