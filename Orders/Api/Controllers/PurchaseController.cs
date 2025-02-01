@@ -1,4 +1,6 @@
-﻿using Application.Requests.Purchases.CreateCheckoutSession;
+﻿using Application.Requests.Purchases;
+using Application.Requests.Purchases.CreateCheckoutSession;
+using Application.Requests.Purchases.GetPurchaseById;
 using Common.Api.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +13,10 @@ public class PurchaseController : BaseApiController
     public PurchaseController(IMediator mediator) : base(mediator)
     {}
 
-    // TODO: Get By ID
+    [AllowAnonymous]
+    [HttpGet("{PurchaseId}")]
+    public Task<ActionResult<PurchaseResult>> GetPurchaseById([FromRoute] GetPurchaseByIdQuery query) =>
+            HandleRequest(query);
 
     [AllowAnonymous]
     [HttpPost("session")]

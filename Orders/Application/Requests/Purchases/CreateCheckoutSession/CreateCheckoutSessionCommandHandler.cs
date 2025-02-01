@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Common.Application.Interfaces;
 using Common.Application.Models;
 using Domain.Entities;
 using Domain.Enums;
@@ -9,12 +10,14 @@ namespace Application.Requests.Purchases.CreateCheckoutSession;
 public class CreateCheckoutSessionCommandHandler : IRequestHandler<CreateCheckoutSessionCommand, Result<CreateCheckoutSessionCommandResult>>
 {
     private readonly IPaymentService _paymentService;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IUnitOfWork _unitOfWork;
 
-    public CreateCheckoutSessionCommandHandler(IPaymentService paymentService, IUnitOfWork unitOfWork)
+    public CreateCheckoutSessionCommandHandler(IPaymentService paymentService, IUnitOfWork unitOfWork, IDateTimeProvider dateTimeProvider)
     {
         _paymentService = paymentService;
         _unitOfWork = unitOfWork;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<Result<CreateCheckoutSessionCommandResult>> Handle(CreateCheckoutSessionCommand request, CancellationToken cancellationToken)
@@ -38,7 +41,7 @@ public class CreateCheckoutSessionCommandHandler : IRequestHandler<CreateCheckou
             Order = order,
             PaymentMethod = request.PaymentMethod,
             Amount = purchaseAmount,
-            PurchaseTimestamp = DateTime.UtcNow,
+            PurchaseTimestamp = _dateTimeProvider.GetCurrentTime(),
         };
 
         var checkoutSessionUrl = await _paymentService.CreateOneTimeCheckoutSessionAsync(
