@@ -9,6 +9,14 @@ services:
     ports:
       - "5432:5432"
     
+  inventory-db:  
+    image: postgres:16.3
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:5432"  
+
   orders:
     build: 
       context: ./Orders
@@ -52,11 +60,10 @@ services:
     environment:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_NAME=postgres
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
     depends_on:
-      - postgres
+      - inventory-db
     ports:
       - "8084:5000" 
-   
