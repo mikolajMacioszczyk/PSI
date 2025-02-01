@@ -8,11 +8,13 @@ public class UnitOfWork : IUnitOfWork
     private readonly OrdersContext _context;
 
     public IOrderRepository OrderRepository { get; }
+    public IPurchaseRepository PurchaseRepository { get; }
 
     public UnitOfWork(OrdersContext context)
     {
         _context = context;
         OrderRepository = new OrderRepository(context);
+        PurchaseRepository = new PurchaseRepository(context);
     }
 
     public event EventHandler? BeforeSaveChanges;
