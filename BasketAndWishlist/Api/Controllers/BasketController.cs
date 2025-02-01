@@ -3,6 +3,7 @@ using Application.Requests.Baskets.AddProductToBasket;
 using Application.Requests.Baskets.CreateOrGetBasket;
 using Application.Requests.Baskets.GetBasketById;
 using Application.Requests.Baskets.PopulateMockBasket;
+using Application.Requests.Baskets.SetBasketInactive;
 using Application.Requests.Baskets.SubstractProductFromBasket;
 using Common.Api.Controllers;
 using Common.Infrastructure.AuthenticationAdapters;
@@ -23,6 +24,11 @@ namespace Api.Controllers
             HandleRequest(query);
 
         [AllowAnonymous]
+        [HttpPost("guest")]
+        public async Task<ActionResult<BasketResult>> CreateEmptyBasket([FromBody] CreateOrGetBasketCommand command) =>
+            Ok(await _mediator.Send(command));
+
+        [Authorize]
         [HttpPost()]
         public async Task<ActionResult<BasketResult>> CreateOrGetBasket([FromBody] CreateOrGetBasketCommand command) =>
             Ok(await _mediator.Send(command));
@@ -40,6 +46,11 @@ namespace Api.Controllers
         [AllowAnonymous]
         [HttpPut("{BasketId}/product/{ProductInCatalogId}/substract")]
         public Task<ActionResult<BasketResult>> AddProductToBasket([FromRoute] SubstractProductFromBasketCommand command) =>
+            HandleRequest(command);
+
+        [AllowAnonymous]
+        [HttpPut("{BasketId}/inactive")]
+        public Task<ActionResult<BasketResult>> SetBasketInactive([FromRoute] SetBasketInactiveCommand command) =>
             HandleRequest(command);
     }
 }

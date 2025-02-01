@@ -47,7 +47,7 @@ public class GetBasketByIdQueryHandlerTests
         var basketId = Guid.NewGuid();
         var command = new GetBasketByIdQuery(basketId);
 
-        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = [] };
+        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = [], IsActive = true };
         _basketRepositoryMock.Setup(m => m.GetByIdWithProducts(basketId))
             .ReturnsAsync(basketFromRepo)
             .Verifiable();

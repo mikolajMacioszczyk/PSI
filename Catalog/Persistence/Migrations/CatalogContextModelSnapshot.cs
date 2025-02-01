@@ -39,6 +39,11 @@ namespace Persistence.Migrations
                     b.Property<DateTime?>("InCatalogToTimestamp")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
                     b.Property<string>("PhotoUrl")
                         .IsRequired()
                         .HasMaxLength(1024)
@@ -57,7 +62,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CatalogProduct");
+                    b.ToTable("CatalogProduct", (string)null);
                 });
 #pragma warning restore 612, 618
         }

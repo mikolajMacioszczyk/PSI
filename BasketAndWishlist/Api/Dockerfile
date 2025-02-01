@@ -13,7 +13,8 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["BasketAndWishlist/Api/Api.csproj", "BasketAndWishlist/Api/"]
 RUN dotnet restore "./BasketAndWishlist/Api/Api.csproj"
-COPY . .
+COPY ./Common ./Common
+COPY ./BasketAndWishlist ./BasketAndWishlist
 WORKDIR "/src/BasketAndWishlist/Api"
 RUN dotnet build "./Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 

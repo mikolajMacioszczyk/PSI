@@ -45,6 +45,30 @@ public class AddProductToBasketCommandHandlerTests
         _basketRepositoryMock.Verify();
     }
 
+    [Fact]
+    public async Task InactiveBasket_ReturnsNotFound()
+    {
+        // Arrange
+        var basketId = Guid.NewGuid();
+        var productInCatalogId = Guid.NewGuid();
+        var command = new AddProductToBasketCommand(basketId, productInCatalogId);
+        var expectedErrorMesage = $"Basket with provided id {basketId} is not active";
+
+        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = [], IsActive = false };
+
+        _basketRepositoryMock.Setup(m => m.GetByIdWithProducts(basketId))
+            .ReturnsAsync(basketFromRepo)
+            .Verifiable();
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(expectedErrorMesage, result.ErrorMessage);
+        _basketRepositoryMock.Verify();
+    }
+
     [Theory]
     [InlineData(1, 2)]
     [InlineData(2, 3)]
@@ -56,7 +80,7 @@ public class AddProductToBasketCommandHandlerTests
         var productInCatalogId = Guid.NewGuid();
         var command = new AddProductToBasketCommand(basketId, productInCatalogId);
 
-        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = [] };
+        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = [], IsActive = true };
         
         var existingProduct = new ProductInBasket 
         {
@@ -92,7 +116,7 @@ public class AddProductToBasketCommandHandlerTests
         var command = new AddProductToBasketCommand(basketId, productInCatalogId);
         var expectedErrorMesage = $"Catalog product with provided id {productInCatalogId} not exists";
 
-        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = [] };
+        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = [], IsActive = true };
         _basketRepositoryMock.Setup(m => m.GetByIdWithProducts(basketId))
             .ReturnsAsync(basketFromRepo)
             .Verifiable();
@@ -119,7 +143,7 @@ public class AddProductToBasketCommandHandlerTests
         var productInCatalogId = Guid.NewGuid();
         var command = new AddProductToBasketCommand(basketId, productInCatalogId);
 
-        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = [] };
+        var basketFromRepo = new Basket { Id = basketId, ProductsInBaskets = [], IsActive = true };
         _basketRepositoryMock.Setup(m => m.GetByIdWithProducts(basketId))
             .ReturnsAsync(basketFromRepo)
             .Verifiable();
@@ -129,6 +153,7 @@ public class AddProductToBasketCommandHandlerTests
             Id = productInCatalogId,
             ProductId = Guid.NewGuid(),
             Price = 10,
+            Name = "product name",
             PhotoUrl = "photo url",
             SKU = "sku",
             Description = "catalog product description"

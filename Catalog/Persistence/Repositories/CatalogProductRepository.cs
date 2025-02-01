@@ -25,7 +25,7 @@ public class CatalogProductRepository : ICatalogProductRepository
 
         var totalCount = await query.CountAsync();
 
-        var pagedCollection = await _context.CatalogProducts.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+        var pagedCollection = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
         return (pagedCollection, totalCount);
     }
@@ -33,5 +33,10 @@ public class CatalogProductRepository : ICatalogProductRepository
     public async Task<CatalogProduct?> GetById(Guid id)
     {
         return await _context.CatalogProducts.FirstOrDefaultAsync(p => p.Id == id);
+    }
+
+    public async Task<IEnumerable<CatalogProduct>> GetByIds(IEnumerable<Guid> ids)
+    {
+        return await _context.CatalogProducts.Where(p => ids.Contains(p.Id)).ToListAsync();
     }
 }

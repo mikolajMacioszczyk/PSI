@@ -14,7 +14,8 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Catalog/Api/Api.csproj", "Catalog/Api/"]
 RUN dotnet restore "./Catalog/Api/Api.csproj"
-COPY . .
+COPY ./Common ./Common
+COPY ./Catalog ./Catalog
 WORKDIR "/src/Catalog/Api"
 RUN dotnet build "./Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 

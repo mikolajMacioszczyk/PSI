@@ -1,5 +1,6 @@
 using Api.Extensions;
 using Application.Interfaces;
+using Application.Services;
 using FluentValidation.AspNetCore;
 using Infrastructure.AuthenticationAdapters;
 using Microsoft.EntityFrameworkCore;
@@ -60,6 +61,17 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .SetIsOriginAllowed(origin => true);
     });
+});
+
+// httpClients
+builder.Services.AddHttpClient<IBasketService, HttpBasketService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("BasketAndWishlist")!);
+});
+
+builder.Services.AddHttpClient<ICatalogService, HttpCatalogService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("Catalog")!);
 });
 
 // tokena validation

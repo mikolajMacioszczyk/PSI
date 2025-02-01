@@ -12,7 +12,7 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(OrdersContext))]
-    [Migration("20241229105825_Initial")]
+    [Migration("20250129162757_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -67,7 +67,7 @@ namespace Persistence.Migrations
                     b.HasIndex("ShipmentId")
                         .IsUnique();
 
-                    b.ToTable("Order");
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Domain.Entities.OrderStatusChangedNotification", b =>
@@ -100,7 +100,7 @@ namespace Persistence.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderStatusChangedNotification");
+                    b.ToTable("OrderStatusChangedNotifications");
                 });
 
             modelBuilder.Entity("Domain.Entities.Purchase", b =>
@@ -120,7 +120,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Purchase");
+                    b.ToTable("Purchases");
                 });
 
             modelBuilder.Entity("Domain.Entities.Shipment", b =>
@@ -193,7 +193,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Shipment");
+                    b.ToTable("Shipments");
                 });
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
