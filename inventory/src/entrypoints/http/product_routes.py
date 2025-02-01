@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 from typing import List
 from src.models import ProductSchema, ProductUpdate, ProductCreate, Product
@@ -8,7 +7,6 @@ from src.repositories.relational_db.product_repository import get_products_by_sk
 from src.repositories.relational_db import get_db
 from src.common.auth import get_role_from_token
 from src.usecases import notify_low_stock
-from sqlalchemy.exc import IntegrityError
 router = APIRouter()
 security = HTTPBearer()
 
@@ -65,6 +63,19 @@ async def get_product(
         raise HTTPException(status_code=404, detail="Product not found")
     return product
 
+@router.get("/products")
+async def get_all_products(db: Session = Depends(get_db), token: HTTPAuthorizationCredentials = Depends(security)):
+    role = get_role_from_token(token)
+    if "WarehouseEmployee" not in role and "Admin" not in role:
+        raise HTTPException(status_code=403, detail="Permission denied")
+
+    # Pobieramy wszystkie produkty z bazy danych
+    products = db.query(Product).all()
+
+    if not products:
+        raise HTTPException(status_code=404, detail="No products found")
+
+    return products
 
 @router.post("/product/", response_model=ProductCreate)
 async def create_product(
