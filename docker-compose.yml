@@ -35,7 +35,7 @@ services:
       ConnectionStrings__BasketAndWishlist: http://basket-and-wishlist:8080/
       ConnectionStrings__Catalog: http://catalog:8080/
       KeycloakServiceConfig__AuthServerUrl: http://keycloak:8080/
-      StripeSecretKey: ${StripeSecretKey}
+      Payment__StripeSecretKey: ${StripeSecretKey}
     depends_on:
       - shop-db
     ports:

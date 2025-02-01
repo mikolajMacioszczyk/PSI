@@ -1,24 +1,23 @@
 ﻿using Application.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Stripe.Checkout;
 
 namespace Infrastructure.PaymentsAdapter;
 
 public class StripePaymentService : IPaymentService
 {
-    /// <summary>
-    /// Creates checkout session
-    /// </summary>
-    /// <param name="productName">Only a label</param>
-    /// <param name="amount">Amount in cents (e.g., $10.00 = 1000)</param>
-    /// <param name="currency">like pln</param>
-    /// <param name="currency">like pln</param>
-    /// <param name="paymentMethodType">One of: "card", "blik", "p24", "paypal", </param>
-    /// <param name="cancelUrl"></param>
-    /// <returns></returns>
+    private const string paymentMode = "payment";
+    private readonly string _currency;
+
+    public StripePaymentService(IConfiguration configuration)
+    {
+        _currency = configuration.GetSection("Payment").GetValue<string>("Currency")
+            ?? throw new NullReferenceException("Currency");
+    }
+
     public async Task<string> CreateOneTimeCheckoutSessionAsync(
         string productName, 
-        long amount, 
-        string currency, 
+        decimal amount, 
         string paymentMethodType,
         string successUrl, 
         string cancelUrl)
@@ -32,8 +31,8 @@ public class StripePaymentService : IPaymentService
                 {
                     PriceData = new SessionLineItemPriceDataOptions
                     {
-                        UnitAmount = amount,
-                        Currency = currency,
+                        UnitAmount = ConvertAmountToLong(amount),
+                        Currency = _currency,
                         ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
                             Name = productName
@@ -42,7 +41,7 @@ public class StripePaymentService : IPaymentService
                     Quantity = 1
                 }
             ],
-            Mode = "payment",
+            Mode = paymentMode,
             SuccessUrl = successUrl,
             CancelUrl = cancelUrl
         };
@@ -51,4 +50,7 @@ public class StripePaymentService : IPaymentService
         Session session = await service.CreateAsync(options);
         return session.Url;
     }
+
+    private static long ConvertAmountToLong(decimal amount) =>
+        (long) (amount * 100);
 }

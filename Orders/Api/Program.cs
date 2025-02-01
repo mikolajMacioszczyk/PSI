@@ -80,7 +80,9 @@ builder.Services.AddHttpClient<ICatalogService, HttpCatalogService>(client =>
 builder.Services.AddKeycloakJwtAuthentication(builder, builder.Environment, withIntrospection: true);
 
 // stripe
-StripeConfiguration.ApiKey = builder.Configuration.GetValue<string>("StripeSecretKey");
+StripeConfiguration.ApiKey = builder.Configuration.GetSection("Payment").GetValue<string>("StripeSecretKey")
+    ?? throw new NullReferenceException("StripeSecretKey");
+
 builder.Services.AddScoped<IPaymentService, StripePaymentService>();
 
 var app = builder.Build();

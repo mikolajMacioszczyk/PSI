@@ -4,8 +4,7 @@ public interface IPaymentService
 {
     Task<string> CreateOneTimeCheckoutSessionAsync(
         string productName,
-        long amount,
-        string currency,
+        decimal amount,
         string paymentMethodType,
         string successUrl,
         string cancelUrl);
