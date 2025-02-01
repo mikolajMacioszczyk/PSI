@@ -77,7 +77,7 @@ class OrganizationUser(HttpUser):
             "Content-Type": "application/json" 
         }
 
-        create_basket_response = self.client.post("/Basket/guest", headers=headers, data=json.dumps({}), verify=False)
+        create_basket_response = self.client.post("/Basket/guest", name="create basket", headers=headers, data=json.dumps({}), verify=False)
 
         if create_basket_response.status_code == 200:
             response_json = create_basket_response.json()
@@ -93,7 +93,7 @@ class OrganizationUser(HttpUser):
         }
 
         log(f"Getting basket {self.user.basket_id}", LogLevel.DEBUG)
-        get_basket_response = self.client.get(f"/Basket/{self.user.basket_id}", headers=headers, verify=False)
+        get_basket_response = self.client.get(f"/Basket/{self.user.basket_id}", name="get basket", headers=headers, verify=False)
 
         if get_basket_response.status_code == 200:
             log(f"Got basket {self.user.basket_id} from basket for user {self.user.id}", LogLevel.DEBUG)
@@ -108,7 +108,7 @@ class OrganizationUser(HttpUser):
 
         product_id = self.get_random_product_id()
         log(f"Adding product {product_id} to basket {self.user.basket_id}", LogLevel.DEBUG)
-        add_product_response = self.client.put(f"/Basket/{self.user.basket_id}/product/{product_id}/add", headers=headers, data=json.dumps({}), verify=False)
+        add_product_response = self.client.put(f"/Basket/{self.user.basket_id}/product/{product_id}/add", name="add product to basket", headers=headers, data=json.dumps({}), verify=False)
 
         if add_product_response.status_code == 200:
             log(f"Added product {product_id} to basket for user {self.user.id}", LogLevel.DEBUG)
