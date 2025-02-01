@@ -3,5 +3,7 @@ uvicorn~=0.34.0
 SQLAlchemy~=2.0.37
 pydantic~=2.10.6
 psycopg2-binary
-PyJWT
+PyJWT~=2.10.1
 Faker~=35.2.0
+
+websockets~=14.2
