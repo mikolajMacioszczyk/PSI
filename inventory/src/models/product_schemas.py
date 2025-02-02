@@ -16,6 +16,7 @@ class ProductSchema(BaseModel):
         from_attributes = True
 
 class ProductCreate(BaseModel):
+    index: Optional[int] = None
     stock: int
     price: float
     warehouse_id: int
@@ -24,6 +25,9 @@ class ProductCreate(BaseModel):
     rozmiarY: float
     rozmiarZ: float
     kolor: str
+
+    class Config:
+        from_attributes = True
 
 class ProductUpdate(BaseModel):
     stock: Optional[int] = None
