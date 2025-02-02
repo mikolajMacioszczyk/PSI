@@ -1,21 +1,32 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.websockets import WebSocket, WebSocketDisconnect
+
+from src.common import active_connections
 from src.entrypoints.http.product_routes import router as product_router
 from src.entrypoints.http.notification_routes import router as notification_router
 from src.entrypoints.http.warehouse_routes import router as warehouse_router
 from src.entrypoints.http.health_routes import router as health_router
-from src.common import active_connections
-from fastapi import WebSocket, WebSocketDisconnect
-import jwt
 from src.repositories.relational_db import init_db
+
 app = FastAPI(
     title="Warehouse API",
     description="API do zarządzania magazynem i powiadomieniami",
     version="1.0"
 )
+# Konfiguracja CORS, aby umożliwić zapytania z określonego źródła (np. http://localhost:4200)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Zezwala tylko na zapytania z tej domeny
+    allow_credentials=True,
+    allow_methods=["*"],  # Możesz ograniczyć do określonych metod jak GET, POST
+    allow_headers=["*"],  # Możesz określić, które nagłówki są dozwolone
+)
+
+
 init_db()
 app.include_router(product_router, prefix="/api")
 app.include_router(notification_router, prefix="/api")
-
 app.include_router(warehouse_router, prefix="/api")
 app.include_router(health_router)
 
@@ -24,23 +35,8 @@ async def websocket_endpoint(
     websocket: WebSocket
 ):
     try:
-        token = websocket.query_params.get("token")
-
-        print(f"Token received: {token}")
-        decoded_token = jwt.decode(token, options={"verify_signature": False})
-        print(f"decoded_token: {decoded_token}")
-        role = decoded_token.get("realm_access", {}).get("roles", [])
-
-        print(f"User role: {role}")
-        if "WarehouseEmployee" not in role:
-            await websocket.close()
-            return
-
-        # Akceptowanie połączenia WebSocket
         await websocket.accept()
         active_connections.add(websocket)
-
-        # Nasłuchiwanie połączenia do zakończenia
         while True:
             try:
                 data = await websocket.receive_text()

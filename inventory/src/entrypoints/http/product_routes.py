@@ -68,6 +68,25 @@ async def get_all_products(db: Session = Depends(get_db)):
 
     return products
 
+@router.get("/products/warehouse/{warehouse_id}", response_model=List[str])
+async def get_products_by_warehouse(
+    warehouse_id: int, db: Session = Depends(get_db),
+        token: HTTPAuthorizationCredentials = Depends(security)
+):
+    role = get_role_from_token(token)
+    if "WarehouseEmployee" not in role and "Admin" not in role:
+        raise HTTPException(status_code=403, detail="Permission denied")
+    # Query the database for products belonging to the given warehouse_id
+    products = db.query(Product.sku).filter(Product.warehouse_id == warehouse_id).all()
+
+    if not products:
+        raise HTTPException(status_code=404, detail="No products found in this warehouse")
+
+    # Extract only the SKU values from the query result
+    skus = [product.sku for product in products]
+
+    return skus
+
 @router.post("/product/", response_model=ProductCreate)
 async def create_product(
         product: ProductCreate, db: Session = Depends(get_db), token: HTTPAuthorizationCredentials = Depends(security)
