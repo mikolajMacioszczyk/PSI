@@ -1,0 +1,34 @@
+1.install docker on machine test (https://docs.docker.com/engine/install/ubuntu/)
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+2. Run keycloak
+sudo docker run -d -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
+           -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+           -e KC_HOSTNAME_BACKCHANNEL_DYNAMIC=true \
+           -e KC_HOSTNAME=http://<ip>:8001/ \
+           -e KC_PROXY_HEADERS=xforwarded  \
+           -e KC_PROXY=edge \
+           -e KC_HTTP_ENABLED=true -e KC_HOSTNAME_STRICT_HTTPS=false -p 8001:8080 \
+           254499/keycloak:latest 
+
+3. Allow http to keycloak
+sudo docker exec -it <container_id> bash
+cd /opt/keycloak/bin
+./kcadm.sh config credentials --server http://<ip>:8001 --realm master --user admin --password admin
+./kcadm.sh update realms/master -s sslRequired=NONE
+./kcadm.sh update realms/Shop -s sslRequired=NONE
+4. sudo docker restart <container_id>
+
+5. update deployments

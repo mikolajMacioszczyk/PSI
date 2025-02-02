@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from src.entrypoints.http.product_routes import router as product_router
 from src.entrypoints.http.notification_routes import router as notification_router
 from src.entrypoints.http.warehouse_routes import router as warehouse_router
+from src.entrypoints.http.health_routes import router as health_router
 from src.common import active_connections
 from fastapi import WebSocket, WebSocketDisconnect
 import jwt
@@ -16,6 +17,7 @@ app.include_router(product_router, prefix="/api")
 app.include_router(notification_router, prefix="/api")
 
 app.include_router(warehouse_router, prefix="/api")
+app.include_router(health_router)
 
 @app.websocket("/ws/notifications")
 async def websocket_endpoint(
