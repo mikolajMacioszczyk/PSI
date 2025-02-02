@@ -4,6 +4,7 @@ using Application.Services;
 using FluentValidation.AspNetCore;
 using Infrastructure.AuthenticationAdapters;
 using Infrastructure.PaymentsAdapter;
+
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Stripe;
