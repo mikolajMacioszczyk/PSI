@@ -13,7 +13,6 @@ services:
     build:
       context: ./keycloak
       dockerfile: ./Dockerfile
-    command: -v start-dev --import-realm
     volumes:
       - ./keycloak/imports/Shop_import.Development.json:/opt/keycloak/data/import/Shop_import.json
     environment:
