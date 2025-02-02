@@ -1,5 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.Requests.Orders.CreateOrder;
+using Application.Requests.Purchases.CreateCheckoutSession;
+
 using Application.Services;
 using Common.Application.Interfaces;
 using Common.Application.Services;
@@ -31,6 +33,9 @@ public static class ServiceCollectionExtensions
     public static void AddFluentValidators(this IServiceCollection services)
     {
         services.AddScoped<IValidator<CreateOrderCommand>, CreateOrderCommandValidator>();
+
+        services.AddScoped<IValidator<CreateCheckoutSessionCommand>, CreateCheckoutSessionCommandValidator>();
+
     }
 
     public static void AddSwagger(this IServiceCollection services)

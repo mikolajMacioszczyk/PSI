@@ -3,6 +3,7 @@ using Application.Interfaces;
 using FluentValidation.AspNetCore;
 using Infrastructure.AuthenticationAdapters;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Persistence;
 using System.Reflection;
 using System.Text.Json.Serialization;
