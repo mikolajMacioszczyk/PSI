@@ -15,12 +15,18 @@ public class CatalogDbMigrator : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        using (var scope = _services.CreateScope())
+        try
         {
-            var ctx = scope.ServiceProvider.GetRequiredService<CatalogContext>();
-            await ctx.Database.MigrateAsync();
+            using (var scope = _services.CreateScope())
+            {
+                var ctx = scope.ServiceProvider.GetRequiredService<CatalogContext>();
+                await ctx.Database.MigrateAsync();
 
-            await CatalogSeed.SeedDefaultProducts(ctx);
+                await CatalogSeed.SeedDefaultProducts(ctx);
+            }
+        }
+        catch (Exception ex)
+        {
         }
     }
 

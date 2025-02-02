@@ -15,11 +15,16 @@ public class OrdersDbMigrator : IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        using (var scope = _services.CreateScope())
+        try
         {
-            var ctx = scope.ServiceProvider.GetRequiredService<OrdersContext>();
-            ctx.Database.Migrate();
+            using (var scope = _services.CreateScope())
+            {
+                var ctx = scope.ServiceProvider.GetRequiredService<OrdersContext>();
+                ctx.Database.Migrate();
+            }
         }
+        catch(Exception ex)
+        {}
 
         return Task.CompletedTask;
     }
