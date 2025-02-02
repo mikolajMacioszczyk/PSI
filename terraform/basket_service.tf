@@ -11,7 +11,7 @@ module "basket-deployment" {
     { name = "ASPNETCORE_ENVIRONMENT", value = "Development" },
     { name = "ConnectionStrings__Db", value= "Server=${aws_db_instance.shop_db.endpoint};Port=5432;Database=${aws_db_instance.shop_db.db_name};User Id=${aws_db_instance.shop_db.username};Password=${aws_db_instance.shop_db.password}"},
     { name = "ConnectionStrings__Catalog", value = "http://${module.catalog-deployment.service_dns_name}:8080/" },
-    { name = "KeycloakServiceConfig__AuthServerUrl", value = "http://${module.keycloak-deployment.service_dns_name}:8080/" },
+    { name = "KeycloakServiceConfig__AuthServerUrl", value = "http://ec2-34-238-151-170.compute-1.amazonaws.com:8001/" },
   ]
 }
 
