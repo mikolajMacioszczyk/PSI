@@ -1,0 +1,4 @@
+Method,Name,Error,Occurrences
+GET,get basket,HTTPError('504 Server Error: Gateway Time-out for url: get basket'),8
+PUT,add product to basket,HTTPError('504 Server Error: Gateway Time-out for url: add product to basket'),174
+POST,create basket,HTTPError('504 Server Error: Gateway Time-out for url: create basket'),2
