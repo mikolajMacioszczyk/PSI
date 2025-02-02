@@ -86,6 +86,7 @@ public class AddProductToBasketCommandHandlerTests
         {
             Id = Guid.NewGuid(),
             ProductInCatalogId = productInCatalogId, 
+            SKU = "sku",
             PieceCount = existingPieceCount,
             Basket = basketFromRepo,
             BasketId = basketId,
@@ -151,7 +152,6 @@ public class AddProductToBasketCommandHandlerTests
         var catalogProduct = new CatalogProduct()
         {
             Id = productInCatalogId,
-            ProductId = Guid.NewGuid(),
             Price = 10,
             Name = "product name",
             PhotoUrl = "photo url",

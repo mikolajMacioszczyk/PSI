@@ -41,7 +41,8 @@ public class AddProductToBasketCommandHandler : IRequestHandler<AddProductToBask
         }
         else
         {
-            if (await _catalogProductsService.GetCatalogProductById(request.ProductInCatalogId) is null)
+            var product = await _catalogProductsService.GetCatalogProductById(request.ProductInCatalogId);
+            if (product is null)
             {
                 return new Failure($"Catalog product with provided id {request.ProductInCatalogId} not exists");
             }
@@ -52,6 +53,7 @@ public class AddProductToBasketCommandHandler : IRequestHandler<AddProductToBask
                 Basket = basket,
                 BasketId = basket.Id,
                 ProductInCatalogId = request.ProductInCatalogId,
+                SKU = product.SKU,
                 PieceCount = 1
             };
             await _unitOfWork.ProductInBasketRepository.CreateAsync(newProductEntry);

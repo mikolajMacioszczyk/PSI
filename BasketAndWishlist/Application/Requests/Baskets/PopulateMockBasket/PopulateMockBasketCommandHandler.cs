@@ -48,6 +48,7 @@ public class PopulateMockBasketCommandHandler : IRequestHandler<PopulateMockBask
                 Basket = basket,
                 BasketId = basket.Id,
                 ProductInCatalogId = catalogProduct.Id,
+                SKU = catalogProduct.SKU,
                 PieceCount = random.Next(1, 5)
             };
             basket.ProductsInBaskets.Add(productInBasket);

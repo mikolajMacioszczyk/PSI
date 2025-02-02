@@ -108,6 +108,7 @@ public class SubstractProductFromBasketCommandHandlerTests
         {
             Id = Guid.NewGuid(),
             ProductInCatalogId = productInCatalogId,
+            SKU = "sku",
             PieceCount = existingPieceCount,
             Basket = basketFromRepo,
             BasketId = basketId,
@@ -143,6 +144,7 @@ public class SubstractProductFromBasketCommandHandlerTests
         {
             Id = Guid.NewGuid(),
             ProductInCatalogId = productInCatalogId,
+            SKU = "sku",
             PieceCount = 1,
             Basket = basketFromRepo,
             BasketId = basketId,
