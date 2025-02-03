@@ -52,6 +52,8 @@ public class CreateCheckoutSessionCommandHandler : IRequestHandler<CreateCheckou
             $"{request.CancelUrl}/{purchase.Id}"
             );
 
+        order.OrderStatus = OrderStatus.Paid;
+
         await _unitOfWork.PurchaseRepository.CreateAsync(purchase);
         await _unitOfWork.SaveChangesAsync();
 
