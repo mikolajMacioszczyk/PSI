@@ -77,6 +77,12 @@ builder.Services.AddHttpClient<ICatalogService, HttpCatalogService>(client =>
     client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("Catalog")!);
 });
 
+builder.Services.AddHttpClient<IInventoryService, HttpInventoryService>(client =>
+{
+    // TODO: add connectionstrings to terraform
+    client.BaseAddress = new Uri(builder.Configuration.GetConnectionString("Inventory")!);
+});
+
 // tokena validation
 builder.Services.AddKeycloakJwtAuthentication(builder, builder.Environment, withIntrospection: true);
 

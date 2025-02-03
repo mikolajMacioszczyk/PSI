@@ -41,7 +41,8 @@ services:
       ConnectionStrings__Db: Server=shop-db;Port=5432;Database=Orders;User Id=${DB_USER};Password=${DB_PASSWORD}
       ConnectionStrings__BasketAndWishlist: http://basket-and-wishlist:8080/
       ConnectionStrings__Catalog: http://catalog:8080/
-      KeycloakServiceConfig__AuthServerUrl: http://keycloak:8080/
+      ConnectionStrings__Inventory: http://catalog:8080/
+      KeycloakServiceConfig__AuthServerUrl: http://inventory:5000/
       Payment__StripeSecretKey: ${StripeSecretKey}
     depends_on:
       - shop-db

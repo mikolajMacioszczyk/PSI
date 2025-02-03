@@ -28,6 +28,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IOrderPriceService, OrderPriceService>();
         services.AddScoped<IOrderNumberService, OrderNumberService>();
         services.AddScoped<IShipmentService, ShipmentService>();
+        services.AddScoped<IInventoryService, HttpInventoryService>();
     }
 
     public static void AddFluentValidators(this IServiceCollection services)
