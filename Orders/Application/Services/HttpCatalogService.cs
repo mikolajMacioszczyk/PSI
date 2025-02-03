@@ -13,6 +13,7 @@ public class HttpCatalogService : HttpServiceBase, ICatalogService
     {
         if (ids.Any())
         {
+            ids = ids.Distinct();
             return (await Get<IEnumerable<CatalogProduct>>($"ActiveProducts/search?Ids={string.Join("&Ids=", ids)}"))!;
         }
         return [];
