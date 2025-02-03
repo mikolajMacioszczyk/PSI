@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Application.Requests.Orders.GetOrderById;
 
-public record GetOrderByIdQuery(Guid Id) : IRequest<Result<OrderResult>>;
+public record GetOrderByIdQuery(Guid Id) : IRequest<Result<GetOrderByIdQueryResult>>;
