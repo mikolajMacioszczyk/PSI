@@ -7,6 +7,7 @@ public interface IOrderRepository
 {
     
     Task<Order?> GetByIdWithShipment(Guid orderId);
+    Task<Order?> GetByIdWithShipmentAndPurchase(Guid orderId);
     Task<Order?> GetNewestOrder();
     Task<(ICollection<Order>, int totalCount)> GetPaged<TKey>(
         int pageNumber, 

@@ -23,7 +23,7 @@ public class GetOrderByIdQueryHandler : IRequestHandler<GetOrderByIdQuery, Resul
     public async Task<Result<GetOrderByIdQueryResult>> Handle(GetOrderByIdQuery request, CancellationToken cancellationToken)
 
     {
-        var order = await _unitOfWork.OrderRepository.GetByIdWithShipment(request.Id);
+        var order = await _unitOfWork.OrderRepository.GetByIdWithShipmentAndPurchase(request.Id);
 
         if (order is null)
         {
