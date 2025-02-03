@@ -19,7 +19,7 @@ namespace Api.Controllers
 
         [AllowAnonymous]
         [HttpGet("{Id}")]
-        public Task<ActionResult<OrderResult>> GetOrderById([FromRoute] GetOrderByIdQuery query) =>
+        public Task<ActionResult<GetOrderByIdQueryResult>> GetOrderById([FromRoute] GetOrderByIdQuery query) =>
             HandleRequest(query);
 
         [AllowAnonymous]

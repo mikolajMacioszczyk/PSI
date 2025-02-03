@@ -21,6 +21,14 @@ public class OrderRepository : IOrderRepository
             .FirstOrDefaultAsync(o => o.Id == orderId);
     }
 
+    public Task<Order?> GetByIdWithShipmentAndPurchase(Guid orderId)
+    {
+        return _context.Orders
+            .Include(o => o.Shipment)
+            .Include(o => o.Purchase)
+            .FirstOrDefaultAsync(o => o.Id == orderId);
+    }
+
     public Task<Order?> GetNewestOrder()
     {
         return _context.Orders.OrderByDescending(o => o.SubmitionTimestamp).FirstOrDefaultAsync();
