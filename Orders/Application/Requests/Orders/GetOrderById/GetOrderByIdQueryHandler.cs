@@ -5,18 +5,22 @@ using MediatR;
 
 namespace Application.Requests.Orders.GetOrderById;
 
-public class GetOrderByIdQueryHandler : IRequestHandler<GetOrderByIdQuery, Result<OrderResult>>
+public class GetOrderByIdQueryHandler : IRequestHandler<GetOrderByIdQuery, Result<GetOrderByIdQueryResult>>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IBasketService _basketService;
+    private readonly ICatalogService _catalogService;
     private readonly IMapper _mapper;
 
-    public GetOrderByIdQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+    public GetOrderByIdQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IBasketService basketService, ICatalogService catalogService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _basketService = basketService;
+        _catalogService = catalogService;
     }
 
-    public async Task<Result<OrderResult>> Handle(GetOrderByIdQuery request, CancellationToken cancellationToken)
+    public async Task<Result<GetOrderByIdQueryResult>> Handle(GetOrderByIdQuery request, CancellationToken cancellationToken)
 
     {
         var order = await _unitOfWork.OrderRepository.GetByIdWithShipment(request.Id);
@@ -26,6 +30,13 @@ public class GetOrderByIdQueryHandler : IRequestHandler<GetOrderByIdQuery, Resul
             return new NotFound(request.Id, $"order with provided id {request.Id} does not exists");
         }
 
-        return _mapper.Map<OrderResult>(order);
+        var orderResult = _mapper.Map<GetOrderByIdQueryResult>(order);
+
+        var basket = await _basketService.GetBasketById(order.BasketId);
+        var catalogIds = basket!.ProductsInBaskets.Select(p => p.ProductInCatalogId).Distinct().ToList();
+
+        orderResult.Products = await _catalogService.GetCatalogProductsByIds(catalogIds);
+
+        return orderResult;
     }
 }
